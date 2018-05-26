@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:build/build.dart';
 import 'package:yaml/yaml.dart';
 
-import 'src/util.dart';
+import 'package:code_excerpter/src/util/line.dart';
 
 Builder builder(BuilderOptions options) => new CodeExcerptBuilder(options);
 

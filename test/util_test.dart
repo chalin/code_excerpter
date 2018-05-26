@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:code_excerpter/src/util.dart';
+import 'package:code_excerpter/src/util/line.dart';
 
 void main() {
   group('maxUnindent', () {
