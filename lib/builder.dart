@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:build/build.dart';
 
 import 'package:code_excerpter/src/util/line.dart';
+import 'package:code_excerpter/src/excerpter.dart';
 
 Builder builder(BuilderOptions options) => new CodeExcerptBuilder(options);
 
@@ -24,8 +25,11 @@ class CodeExcerptBuilder implements Builder {
     // TODO: remove temp code
     if (assetId.path.contains('src')) return;
 
-    log.info('>> writing to $outputAssetId');
-    final yaml = _yamlEntry('', content);
+    final excerpter = new Excerpter(assetId.path, content);
+    excerpter.weave();
+
+    final yaml = _toYaml(excerpter.excerpts);
+    log.info('writing to $outputAssetId');
     buildStep.writeAsString(outputAssetId, yaml);
   }
 
@@ -34,13 +38,19 @@ class CodeExcerptBuilder implements Builder {
         '': [outputExtension]
       };
 
-  String _yamlEntry(String regionName, String excerpt) {
-    final lines = excerpt.split(eol);
-    dropTrailingBlankLines(lines);
-    final codeAsYamlStringValue =
-        maxUnindent(lines) // normalize/left-shift indentation
-            .map((line) => '  $line') // indent by 2 spaces for YAML
-            .join(eol);
+  String _toYaml(Map<String, List<String>> excerpts) {
+    final StringBuffer s = new StringBuffer();
+
+    excerpts.forEach((name, lines) {
+      s.writeln(_yamlEntry(name, lines));
+    });
+    return s.toString();
+  }
+
+  String _yamlEntry(String regionName, List<String> lines) {
+    final codeAsYamlStringValue = lines
+        .map((line) => '  $line') // indent by 2 spaces for YAML
+        .join(eol);
     return "'$regionName': |+\n$codeAsYamlStringValue";
   }
 }
