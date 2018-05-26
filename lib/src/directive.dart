@@ -1,0 +1,43 @@
+///
+import 'nullable.dart';
+
+final _directiveRegEx = new RegExp(r'#((?:end)?docregion)\b\s*(.*?)\s*$');
+
+/// Represents a directive line (both the model and lexical elements)
+class Directive {
+  final Match _match;
+  final Kind kind;
+
+  String get line => _match[0];
+  String get lexeme => _match[1];
+  String get rawArgs => _match[2];
+
+  Directive._(this.kind, this._match);
+
+  @nullable
+  factory Directive.tryParse(String line) {
+    final match = _directiveRegEx.firstMatch(line);
+    if (match == null) return null;
+
+    final lexeme = match[1];
+    final kind = tryParseKind(lexeme);
+    return kind == null ? null
+        : new Directive._(kind, match);
+  }
+}
+
+enum Kind {
+  startRegion,
+  endRegion,
+  plaster, // TO be deprecated
+}
+
+@nullable
+Kind tryParseKind(String lexeme) {
+  switch (lexeme) {
+    case 'docregion': return Kind.startRegion;
+    case 'enddocregion': return Kind.endRegion;
+    case 'docplaster': return Kind.plaster;
+    default: return null;
+  }
+}
