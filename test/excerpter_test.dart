@@ -1,6 +1,13 @@
 import 'package:test/test.dart';
 import 'package:code_excerpter/src/excerpter.dart';
 
+/* TODO
+
+- Multiple regions named per directive.
+- Regions with plaster markers
+
+ */
+
 List<String> contentGeneratingNoExcerpts = [
   '',
   'abc',
@@ -8,12 +15,14 @@ List<String> contentGeneratingNoExcerpts = [
   'docregion', // Without leading #
 ];
 
+final emptyLines = new List.unmodifiable([]);
+
 void main() {
   group('no excerpts:', () {
     for (final content in contentGeneratingNoExcerpts) {
       final testName = "'${content.replaceAll('\n', '\\n')}'";
       test(testName, () {
-        Excerpter excerpter = new Excerpter(content);
+        final excerpter = new Excerpter(content);
         excerpter.weave();
         expect(excerpter.excerpts, {});
       });
@@ -22,13 +31,13 @@ void main() {
 
   group('basic delimited region:', () {
     test('empty region', () {
-      Excerpter excerpter = new Excerpter('#docregion\n#enddocregion');
+      final excerpter = new Excerpter('#docregion\n#enddocregion');
       excerpter.weave();
       expect(excerpter.excerpts, {defaultRegionKey: []});
     });
 
     test('1-line region', () {
-      Excerpter excerpter = new Excerpter('#docregion\nabc\n#enddocregion');
+      final excerpter = new Excerpter('#docregion\nabc\n#enddocregion');
       excerpter.weave();
       expect(excerpter.excerpts, {
         defaultRegionKey: ['abc']
@@ -36,39 +45,80 @@ void main() {
     });
   });
 
+  group('normalized indentation', () {
+    test('default region', () {
+      final excerpter = new Excerpter('''
+    #docregion
+      abc
+    #enddocregion
+    ''');
+      excerpter.weave();
+      expect(excerpter.excerpts, {
+        defaultRegionKey: ['abc']
+      });
+    });
+
+    test('region a', () {
+      final excerpter = new Excerpter('''
+        #docregion a
+          abc
+        #enddocregion a
+      ''');
+      excerpter.weave();
+      expect(excerpter.excerpts, {
+        defaultRegionKey: ['          abc'],
+        'a': ['abc'],
+      });
+    });
+  });
+
+  test('two disjoint regions', () {
+    final excerpter = new Excerpter('''
+      #docregion a
+        abc
+      #enddocregion a
+      #docregion b
+        def
+      #enddocregion b
+    ''');
+    excerpter.weave();
+    expect(excerpter.excerpts, {
+      defaultRegionKey: ['        abc', '        def'],
+      'a': ['abc'],
+      'b': ['def'],
+    });
+  });
+
+  test('two named regions', () {});
+
   group('region not closed:', () {
-    group('empty file:', () {
-      final expectedLines = [];
+    ['', '\n'].forEach((eol) {
+      group('empty region:', () {
+        test('default region', () {
+          final excerpter = new Excerpter('#docregion$eol');
+          excerpter.weave();
+          expect(excerpter.excerpts, {defaultRegionKey: emptyLines});
+        });
 
-      test('default region', () {
-        Excerpter excerpter = new Excerpter('#docregion');
-        excerpter.weave();
-        expect(excerpter.excerpts, {defaultRegionKey: expectedLines});
+        test('region a', () {
+          final excerpter = new Excerpter('#docregion a$eol');
+          excerpter.weave();
+          expect(excerpter.excerpts,
+              {defaultRegionKey: emptyLines, 'a': emptyLines});
+        });
       });
 
-      test('region a', () {
-        Excerpter excerpter = new Excerpter('#docregion a');
-        excerpter.weave();
-        expect(excerpter.excerpts,
-            {defaultRegionKey: expectedLines, 'a': expectedLines});
-      });
-    });
-
-    group('1-line file:', () {
-      final expectedLines = [''];
-
-      test('default region', () {
-        Excerpter excerpter = new Excerpter('#docregion\n');
-        excerpter.weave();
-        expect(excerpter.excerpts, {defaultRegionKey: expectedLines});
-      });
-
-      test('region a', () {
-        Excerpter excerpter = new Excerpter('#docregion a\n');
+      test('region a with lines but no EOL', () {
+        final expectedLines = ['abc'];
+        final excerpter = new Excerpter('#docregion a\nabc$eol');
         excerpter.weave();
         expect(excerpter.excerpts,
             {defaultRegionKey: expectedLines, 'a': expectedLines});
       });
     });
+  });
+
+  group('problems:', () {
+
   });
 }

@@ -36,17 +36,28 @@ class Excerpter {
 
     for (_lineNum = 0; _lineNum < lines.length; _lineNum++) _processLine();
 
+
+    // Drop trailing blank lines for all excerpts.
+    // Normalize indentation for all but the full file.
+    for(final name in excerpts.keys) {
+      dropTrailingBlankLines(excerpts[name]);
+      if (name == fullFileKey) continue;
+      excerpts[name] = maxUnindent(excerpts[name]);
+    }
+
     // Final adjustment to excerpts relative to fullFileKey:
     if (!containsDirectives) {
-      // No directives, don't report any excerpts
+      // No directives? Don't report any excerpts
       excerpts.clear();
     } else if (excerpts.containsKey(defaultRegionKey)) {
       // There was an explicitly named default region. Drop fullFileKey.
       excerpts.remove(fullFileKey);
     } else {
+      // Report fullFileKey excerpt for defaultRegionKey
       excerpts[defaultRegionKey] = excerpts[fullFileKey];
       excerpts.remove(fullFileKey);
     }
+
   }
 
   void _processLine() {
