@@ -96,7 +96,7 @@ class Excerpter {
         // TODO add special marker. For now just end region
       } else {
         final n = name.startsWith("'") ? name : "'$name'";
-        log.warning('WARNING: end before start directive for region $n');
+        log.warning('end before start directive for region $n');
       }
     }
     containsDirectives = true;

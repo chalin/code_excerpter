@@ -1,11 +1,11 @@
-import 'package:test/test.dart';
 import 'package:code_excerpter/src/excerpter.dart';
+import 'package:code_excerpter/src/util/logging.dart';
+import 'package:logging/logging.dart';
+import 'package:test/test.dart';
 
-/* TODO
-
+/* TODO:
 - Multiple regions named per directive.
 - Regions with plaster markers
-
  */
 
 List<String> contentGeneratingNoExcerpts = [
@@ -118,7 +118,31 @@ void main() {
     });
   });
 
-  group('problems:', () {
+  group('problems:', problemCases);
+}
 
+void problemCases() {
+  final logStream = log.onRecord;
+  final List<LogRecord> logs = [];
+
+  setUpAll(() {
+    logStream.listen((record) => logs.add(record));
+  });
+
+  setUp(() => logs.clear());
+
+  tearDownAll(() {
+    log.clearListeners();
+  });
+
+  group('end before start', () {
+    test('default region', () {
+      final excerpter = new Excerpter('#enddocregion');
+      excerpter.weave();
+      // print('>> logs $logs');
+      expect(logs[0].message, contains("end before start directive for region ''"));
+      expect(logs.length, 1);
+      // expect(excerpter.excerpts, {});
+    });
   });
 }
