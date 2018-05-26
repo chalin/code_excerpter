@@ -1,9 +1,11 @@
-///
 import 'nullable.dart';
 
-final _directiveRegEx = new RegExp(r'#((?:end)?docregion)\b\s*(.*?)\s*$');
+/// Directives usually appear inside a line comment. HTML doesn't support
+/// line comments, so we ignore an trailing `-->` syntax, since that couldn't
+/// be a valid argument anyway.
+final _directiveRegEx = new RegExp(r'#((?:end)?docregion)\b\s*(.*?)(?:\s*-->)?\s*$');
 
-/// Represents a directive line (both the model and lexical elements)
+/// Represents a code-excerpter directive (both the model and lexical elements)
 class Directive {
   final Match _match;
   final Kind kind;
