@@ -19,8 +19,6 @@ final _default = new Logger('package:code_excerpter');
 /// Initial logging level. It must be set before calling [log].
 Level initLevel = Level.FINE;
 
-void registerLogRecordHandler(LogRecordHandler h) => _handlers.add(h);
-
 Logger get log {
   if (_logger != null) return _logger;
 
@@ -30,16 +28,16 @@ Logger get log {
   if (_logger == null) {
     _logger = _default;
     Logger.root.level = initLevel;
-    Logger.root.onRecord.listen((r) => _handlers.forEach((h) => h(r)));
+    Logger.root.onRecord.listen((r) => logListeners.forEach((h) => h(r)));
   }
   return _logger;
 }
 
 //---------------------------------------------------------
 
-typedef LogRecordHandler = void Function(LogRecord);
+typedef LogListener = void Function(LogRecord);
 
-final List<LogRecordHandler> _handlers = [
+final List<LogListener> logListeners = [
   printLogRecord,
 ];
 

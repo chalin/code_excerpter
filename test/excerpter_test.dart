@@ -8,6 +8,9 @@ import 'package:test/test.dart';
 - Regions with plaster markers
  */
 
+// Mock URI used for all content origins.
+final uri = 'foo';
+
 List<String> contentGeneratingNoExcerpts = [
   '',
   'abc',
@@ -22,22 +25,22 @@ void main() {
     for (final content in contentGeneratingNoExcerpts) {
       final testName = "'${content.replaceAll('\n', '\\n')}'";
       test(testName, () {
-        final excerpter = new Excerpter(content);
+        final excerpter = new Excerpter(uri, content);
         excerpter.weave();
         expect(excerpter.excerpts, {});
       });
     }
   });
 
-  group('basic delimited region:', () {
+  group('basic delimited default region:', () {
     test('empty region', () {
-      final excerpter = new Excerpter('#docregion\n#enddocregion');
+      final excerpter = new Excerpter(uri, '#docregion\n#enddocregion');
       excerpter.weave();
       expect(excerpter.excerpts, {defaultRegionKey: []});
     });
 
     test('1-line region', () {
-      final excerpter = new Excerpter('#docregion\nabc\n#enddocregion');
+      final excerpter = new Excerpter(uri, '#docregion\nabc\n#enddocregion');
       excerpter.weave();
       expect(excerpter.excerpts, {
         defaultRegionKey: ['abc']
@@ -47,7 +50,7 @@ void main() {
 
   group('normalized indentation', () {
     test('default region', () {
-      final excerpter = new Excerpter('''
+      final excerpter = new Excerpter(uri, '''
     #docregion
       abc
     #enddocregion
@@ -59,7 +62,7 @@ void main() {
     });
 
     test('region a', () {
-      final excerpter = new Excerpter('''
+      final excerpter = new Excerpter(uri, '''
         #docregion a
           abc
         #enddocregion a
@@ -73,7 +76,7 @@ void main() {
   });
 
   test('two disjoint regions', () {
-    final excerpter = new Excerpter('''
+    final excerpter = new Excerpter(uri, '''
       #docregion a
         abc
       #enddocregion a
@@ -95,13 +98,13 @@ void main() {
     ['', '\n'].forEach((eol) {
       group('empty region:', () {
         test('default region', () {
-          final excerpter = new Excerpter('#docregion$eol');
+          final excerpter = new Excerpter(uri, '#docregion$eol');
           excerpter.weave();
           expect(excerpter.excerpts, {defaultRegionKey: emptyLines});
         });
 
         test('region a', () {
-          final excerpter = new Excerpter('#docregion a$eol');
+          final excerpter = new Excerpter(uri, '#docregion a$eol');
           excerpter.weave();
           expect(excerpter.excerpts,
               {defaultRegionKey: emptyLines, 'a': emptyLines});
@@ -110,7 +113,7 @@ void main() {
 
       test('region a with lines but no EOL', () {
         final expectedLines = ['abc'];
-        final excerpter = new Excerpter('#docregion a\nabc$eol');
+        final excerpter = new Excerpter(uri, '#docregion a\nabc$eol');
         excerpter.weave();
         expect(excerpter.excerpts,
             {defaultRegionKey: expectedLines, 'a': expectedLines});
@@ -122,27 +125,33 @@ void main() {
 }
 
 void problemCases() {
-  final logStream = log.onRecord;
   final List<LogRecord> logs = [];
 
   setUpAll(() {
-    logStream.listen((record) => logs.add(record));
+    logListeners.clear(); // Don't print during tests
+    logListeners.add((r) => logs.add(r));
   });
 
   setUp(() => logs.clear());
 
-  tearDownAll(() {
-    log.clearListeners();
-  });
-
   group('end before start', () {
+
     test('default region', () {
-      final excerpter = new Excerpter('#enddocregion');
+      final excerpter = new Excerpter(uri, '#enddocregion');
       excerpter.weave();
-      // print('>> logs $logs');
-      expect(logs[0].message, contains("end before start directive for region ''"));
+      expect(logs[0].message,
+          contains('region "" end without a prior region start at $uri:1'));
       expect(logs.length, 1);
-      // expect(excerpter.excerpts, {});
+      expect(excerpter.excerpts, {defaultRegionKey: emptyLines});
+    });
+
+    test('region a', () {
+      final excerpter = new Excerpter(uri, 'abc\n#enddocregion a');
+      excerpter.weave();
+      expect(logs[0].message,
+          contains('region "a" end without a prior region start at $uri:2'));
+      expect(logs.length, 1);
+      expect(excerpter.excerpts, {defaultRegionKey: ['abc']});
     });
   });
 }

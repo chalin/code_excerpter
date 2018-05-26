@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:build/build.dart';
-import 'package:yaml/yaml.dart';
 
 import 'package:code_excerpter/src/util/line.dart';
 
@@ -27,8 +26,6 @@ class CodeExcerptBuilder implements Builder {
 
     log.info('>> writing to $outputAssetId');
     final yaml = _yamlEntry('', content);
-    final reparsedYaml = loadYaml(yaml);
-    // log.info('>> c == z[""]? ${reparsedYaml[''] == '$content'}');
     buildStep.writeAsString(outputAssetId, yaml);
   }
 

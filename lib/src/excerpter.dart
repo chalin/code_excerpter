@@ -10,20 +10,22 @@ const defaultRegionKey = '';
 Map<String, List<String>> newExcerptsMap() => new Map();
 
 class Excerpter {
+  final String uri;
   final String content;
   final List<String> _lines; // content as list of lines
 
-  // Number of line being processed.
-  int _lineNum;
-  String get _line => _lines[_lineNum];
+  // Index of next line to process.
+  int _lineIdx;
+  int get _lineNum => _lineIdx + 1;
+  String get _line => _lines[_lineIdx];
 
   bool containsDirectives = false;
 
   int get numExcerpts => excerpts.length;
 
-  Excerpter(this.content)
+  Excerpter(this.uri, this.content)
       : _lines = content.split(eol),
-        _lineNum = 0;
+        _lineIdx = 0;
 
   final Map<String, List<String>> excerpts = newExcerptsMap();
   final Set<String> _openExcerpts = new Set();
@@ -34,7 +36,7 @@ class Excerpter {
     // Collect the full file in case we need it.
     _excerptStart(fullFileKey);
 
-    for (_lineNum = 0; _lineNum < lines.length; _lineNum++) _processLine();
+    for (_lineIdx = 0; _lineIdx < lines.length; _lineIdx++) _processLine();
 
 
     // Drop trailing blank lines for all excerpts.
@@ -95,8 +97,8 @@ class Excerpter {
       if (_openExcerpts.remove(name)) {
         // TODO add special marker. For now just end region
       } else {
-        final n = name.startsWith("'") ? name : "'$name'";
-        log.warning('end before start directive for region $n');
+        final n = name.startsWith("'") ? name : '"$name"';
+        _warn('region $n end without a prior region start');
       }
     }
     containsDirectives = true;
@@ -107,4 +109,6 @@ class Excerpter {
     excerpts[name] = [];
     _openExcerpts.add(name);
   }
+
+  void _warn(String msg) => log.warning('$msg at $uri:$_lineNum');
 }
