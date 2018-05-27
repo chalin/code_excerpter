@@ -194,6 +194,31 @@ void problemCases() {
       });
     });
   });
+
+  group('repeated start:', () {
+    test('default region', () {
+      final excerpter = new Excerpter(uri, '#docregion\n#docregion');
+      excerpter.weave();
+      expect(
+          logs[0].message, contains('repeated start for region "" at $uri:2'));
+      expect(logs.length, 1);
+      expect(excerpter.excerpts, {
+        defaultRegionKey: [],
+      });
+    });
+
+    test('region a', () {
+      final excerpter = new Excerpter(uri, '#docregion a\n#docregion a');
+      excerpter.weave();
+      expect(
+          logs[0].message, contains('repeated start for region "a" at $uri:2'));
+      expect(logs.length, 1);
+      expect(excerpter.excerpts, {
+        defaultRegionKey: [],
+        'a': [],
+      });
+    });
+  });
 }
 
 // Utils

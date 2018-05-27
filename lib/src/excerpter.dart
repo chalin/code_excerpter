@@ -69,9 +69,12 @@ class Excerpter {
 
     switch (directive?.kind) {
       case Kind.startRegion:
+        containsDirectives = true;
+        mostRecentStart = directive;
         _startRegion(directive);
         break;
       case Kind.endRegion:
+        containsDirectives = true;
         _endRegion(directive);
         break;
       default:
@@ -84,20 +87,27 @@ class Excerpter {
   }
 
   void _startRegion(Directive directive) {
-    mostRecentStart = directive;
+    @nullable
+    List<String> regionAlreadyStarted;
+
     var regionNames = directive.args;
     log.finer('_startRegion(regionNames = $regionNames)');
 
     if (regionNames.isEmpty) regionNames.add(defaultRegionKey);
     for (final name in regionNames) {
-      _excerptStart(name);
+      final isNew = _excerptStart(name);
+      if (!isNew) (regionAlreadyStarted ??= []).add(_quoteName(name));
     }
-    containsDirectives = true;
+
+    _warnRegions(
+      regionAlreadyStarted,
+          (regions) => 'repeated start for $regions',
+    );
   }
 
   void _endRegion(Directive directive) {
     @nullable
-    List<String> regionEndWithoutStart;
+    List<String> regionsWithoutStart;
     var regionNames = directive.args;
     log.finer('_endRegion(regionNames = $regionNames)');
 
@@ -106,7 +116,7 @@ class Excerpter {
         throw new Exception('${directive.lexeme} without arguments is '
             'supported only in compatibility mode');
       } else if (mostRecentStart == null) {
-        regionEndWithoutStart = [];
+        regionsWithoutStart = [];
       } else {
         regionNames = mostRecentStart.args;
       }
@@ -116,26 +126,41 @@ class Excerpter {
       if (_openExcerpts.remove(name)) {
         // TODO add special marker. For now just end region
       } else {
-        final n = name.startsWith("'") ? name : '"$name"';
-        (regionEndWithoutStart ??= []).add(n);
+        (regionsWithoutStart ??= []).add(_quoteName(name));
       }
     }
-    containsDirectives = true;
 
-    // Warns about end before start for region(s):
-    if (regionEndWithoutStart != null) {
-      final regions = regionEndWithoutStart.join(', ');
-      final s = regions.isEmpty
-          ? ''
-          : regionEndWithoutStart.length > 1 ? 's ($regions)' : ' $regions';
-      _warn('region$s end without a prior start');
-    }
+    _warnRegions(
+      regionsWithoutStart,
+      (regions) => '$regions end without a prior start',
+    );
   }
 
-  void _excerptStart(String name) {
-    _openExcerpts.add(name);
+  void _warnRegions(
+    List<String> _regions,
+    String Function(String) msg,
+  ) {
+    if (_regions == null) return;
+    final regions = _regions.join(', ');
+    final s = regions.isEmpty
+        ? ''
+        : _regions.length > 1 ? 's ($regions)' : ' $regions';
+    _warn(msg('region$s'));
+  }
+
+  /// Registers [name] as an open excerpt.
+  ///
+  /// If [name] is a new excerpt, then its value in
+  /// [excerpts] is set to the empty list.
+  ///
+  /// Returns false iff name was already open
+  bool _excerptStart(String name) {
     excerpts.putIfAbsent(name, () => []);
+    return _openExcerpts.add(name);
   }
 
   void _warn(String msg) => log.warning('$msg at $uri:$_lineNum');
+
+  /// Quote a region name if it isn't already quoted.
+  String _quoteName(String name) => name.startsWith("'") ? name : '"$name"';
 }
