@@ -3,3 +3,15 @@ builders:
     import: 'package:code_excerpter/builder.dart'
     builder_factories: [builder]
     build_extensions: {'': [.yaml]}
+    defaults:
+      generate_for:
+        exclude:
+          - '**/.*/**'
+          - '**/.DS_Store'
+          - '**/build/**'
+          - '**/node_modules/**'
+          - '**/*.bmp'
+          - '**/*.jpg'
+          - '**/*.jpeg'
+          - '**/*.png'
+          - '**/*.tiff'
