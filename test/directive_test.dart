@@ -11,14 +11,16 @@ void main() {
 
     test(Kind.startRegion, () {
       final d = new Directive.tryParse('#docregion');
-      expect(d?.kind, Kind.startRegion);
-      expect(d?.rawArgs, '');
+      expect(d.kind, Kind.startRegion);
+      expect(d.rawArgs, '');
+      expect(d.args, []);
     });
 
     test(Kind.endRegion, () {
       final d = new Directive.tryParse('#enddocregion');
-      expect(d?.kind, Kind.endRegion);
-      expect(d?.rawArgs, '');
+      expect(d.kind, Kind.endRegion);
+      expect(d.rawArgs, '');
+      expect(d.args, []);
     });
   });
 
@@ -26,28 +28,32 @@ void main() {
   group('context insenstivie', () {
     test(Kind.startRegion, () {
       final d = new Directive.tryParse(' // #docregion');
-      expect(d?.kind, Kind.startRegion);
-      expect(d?.rawArgs, '');
+      expect(d.kind, Kind.startRegion);
+      expect(d.rawArgs, '');
+      expect(d.args, []);
     });
 
     test(Kind.endRegion, () {
-      final d = new Directive.tryParse(' #enddocregion a,b,c  ');
-      expect(d?.kind, Kind.endRegion);
-      expect(d?.rawArgs, 'a,b,c');
+      final d = new Directive.tryParse(' #enddocregion a,b,  c  ');
+      expect(d.kind, Kind.endRegion);
+      expect(d.rawArgs, 'a,b,  c');
+      expect(d.args, ['a', 'b', 'c']);
     });
   });
 
   group('ignore HTML close comment syntax', () {
     test(Kind.startRegion, () {
       final d = new Directive.tryParse('<!--#docregion-->');
-      expect(d?.kind, Kind.startRegion);
-      expect(d?.rawArgs, '');
+      expect(d.kind, Kind.startRegion);
+      expect(d.rawArgs, '');
+      expect(d.args, []);
     });
 
     test(Kind.endRegion, () {
       final d = new Directive.tryParse('<!-- #enddocregion a -->  ');
-      expect(d?.kind, Kind.endRegion);
-      expect(d?.rawArgs, 'a');
+      expect(d.kind, Kind.endRegion);
+      expect(d.rawArgs, 'a');
+      expect(d.args, ['a']);
     });
   });
 }

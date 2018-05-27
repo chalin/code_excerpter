@@ -38,10 +38,9 @@ class Excerpter {
 
     for (_lineIdx = 0; _lineIdx < lines.length; _lineIdx++) _processLine();
 
-
     // Drop trailing blank lines for all excerpts.
     // Normalize indentation for all but the full file.
-    for(final name in excerpts.keys) {
+    for (final name in excerpts.keys) {
       dropTrailingBlankLines(excerpts[name]);
       if (name == fullFileKey) continue;
       excerpts[name] = maxUnindent(excerpts[name]);
@@ -59,7 +58,6 @@ class Excerpter {
       excerpts[defaultRegionKey] = excerpts[fullFileKey];
       excerpts.remove(fullFileKey);
     }
-
   }
 
   void _processLine() {
@@ -82,8 +80,10 @@ class Excerpter {
   }
 
   void _startRegion(Directive directive) {
-    List<String> regionNames = [directive.rawArgs];
+    var regionNames = directive.args;
     log.finer('_startRegion(regionNames = $regionNames)');
+
+    if (regionNames.isEmpty) regionNames.add(defaultRegionKey);
     for (final name in regionNames) {
       _excerptStart(name);
     }
@@ -91,8 +91,13 @@ class Excerpter {
   }
 
   void _endRegion(Directive directive) {
-    List<String> regionNames = [directive.rawArgs];
+    var regionNames = directive.args;
     log.finer('_endRegion(regionNames = $regionNames)');
+
+//    if (regionNames.isEmpty) {
+//      _warn('support for ${directive.lexeme} without arguments isn\'t fully implemented');
+//    }
+
     for (final name in regionNames) {
       if (_openExcerpts.remove(name)) {
         // TODO add special marker. For now just end region
@@ -105,9 +110,8 @@ class Excerpter {
   }
 
   void _excerptStart(String name) {
-    if (excerpts.containsKey(name)) return;
-    excerpts[name] = [];
     _openExcerpts.add(name);
+    excerpts.putIfAbsent(name, () => []);
   }
 
   void _warn(String msg) => log.warning('$msg at $uri:$_lineNum');
