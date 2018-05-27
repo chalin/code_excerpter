@@ -41,19 +41,37 @@ void main() {
     });
   });
 
-  group('ignore HTML close comment syntax', () {
-    test(Kind.startRegion, () {
-      final d = new Directive.tryParse('<!--#docregion-->');
-      expect(d.kind, Kind.startRegion);
-      expect(d.rawArgs, '');
-      expect(d.args, []);
+  group('close comment syntax:', () {
+    group('HTML:', () {
+      test(Kind.startRegion, () {
+        final d = new Directive.tryParse('<!--#docregion-->');
+        expect(d.kind, Kind.startRegion);
+        expect(d.rawArgs, '');
+        expect(d.args, []);
+      });
+
+      test(Kind.endRegion, () {
+        final d = new Directive.tryParse('<!-- #enddocregion a -->  ');
+        expect(d.kind, Kind.endRegion);
+        expect(d.rawArgs, 'a');
+        expect(d.args, ['a']);
+      });
     });
 
-    test(Kind.endRegion, () {
-      final d = new Directive.tryParse('<!-- #enddocregion a -->  ');
-      expect(d.kind, Kind.endRegion);
-      expect(d.rawArgs, 'a');
-      expect(d.args, ['a']);
+    group('CSS:', () {
+      test(Kind.startRegion, () {
+        final d = new Directive.tryParse('/*#docregion*/');
+        expect(d.kind, Kind.startRegion);
+        expect(d.rawArgs, '');
+        expect(d.args, []);
+      });
+
+      test(Kind.endRegion, () {
+        final d = new Directive.tryParse('/* #enddocregion a */  ');
+        expect(d.kind, Kind.endRegion);
+        expect(d.rawArgs, 'a');
+        expect(d.args, ['a']);
+      });
     });
   });
 }

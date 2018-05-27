@@ -1,10 +1,14 @@
 import 'nullable.dart';
 
-/// Directives usually appear inside a line comment. HTML doesn't support
-/// line comments, so we ignore an trailing `-->` syntax, since that couldn't
-/// be a valid argument anyway.
+/// Directives usually appear inside a line comment.
+///
+/// Ignore any close comment syntax for
+///
+/// - CSS and Java-like languages: `*/`
+/// - HTML: `-->`
+///
 final _directiveRegEx =
-    new RegExp(r'#((?:end)?docregion)\b\s*(.*?)(?:\s*-->)?\s*$');
+    new RegExp(r'#((?:end)?docregion)\b\s*(.*?)(?:\s*(?:-->|\*\/))?\s*$');
 
 final _argSeparator = new RegExp(r'\s*,\s*');
 
