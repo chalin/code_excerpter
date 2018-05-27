@@ -4,7 +4,6 @@ import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
 /* TODO:
-- Multiple regions named per directive.
 - Regions with plaster markers
  */
 
@@ -168,16 +167,27 @@ void problemCases() {
       final excerpter = new Excerpter(uri, '#enddocregion');
       excerpter.weave();
       expect(logs[0].message,
-          contains('region "" end without a prior region start at $uri:1'));
+          contains('region end without a prior start at $uri:1'));
       expect(logs.length, 1);
       expect(excerpter.excerpts, {defaultRegionKey: emptyLines});
-    }, skip: 'broken');
+    });
 
     test('region a', () {
       final excerpter = new Excerpter(uri, 'abc\n#enddocregion a');
       excerpter.weave();
       expect(logs[0].message,
-          contains('region "a" end without a prior region start at $uri:2'));
+          contains('region "a" end without a prior start at $uri:2'));
+      expect(logs.length, 1);
+      expect(excerpter.excerpts, {
+        defaultRegionKey: ['abc']
+      });
+    });
+
+    test('region a,b', () {
+      final excerpter = new Excerpter(uri, 'abc\n#enddocregion a,b');
+      excerpter.weave();
+      expect(logs[0].message,
+          contains('regions ("a", "b") end without a prior start at $uri:2'));
       expect(logs.length, 1);
       expect(excerpter.excerpts, {
         defaultRegionKey: ['abc']

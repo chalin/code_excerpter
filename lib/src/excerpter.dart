@@ -2,6 +2,7 @@ import 'package:code_excerpter/src/util/line.dart';
 
 import 'directive.dart';
 import 'util/logging.dart';
+import 'nullable.dart';
 
 /// Key used for excerpt representing the entire file w/o directives
 const fullFileKey = '\u0000';
@@ -19,6 +20,8 @@ class Excerpter {
   int get _lineNum => _lineIdx + 1;
   String get _line => _lines[_lineIdx];
 
+  @nullable
+  Directive mostRecentStart;
   bool containsDirectives = false;
 
   int get numExcerpts => excerpts.length;
@@ -81,6 +84,7 @@ class Excerpter {
   }
 
   void _startRegion(Directive directive) {
+    mostRecentStart = directive;
     var regionNames = directive.args;
     log.finer('_startRegion(regionNames = $regionNames)');
 
@@ -92,22 +96,40 @@ class Excerpter {
   }
 
   void _endRegion(Directive directive) {
+    @nullable
+    List<String> regionEndWithoutStart;
     var regionNames = directive.args;
     log.finer('_endRegion(regionNames = $regionNames)');
 
-//    if (regionNames.isEmpty) {
-//      _warn('support for ${directive.lexeme} without arguments isn\'t fully implemented');
-//    }
+    if (regionNames.isEmpty) {
+      if (! /*compatibility mode*/ true) {
+        throw new Exception('${directive.lexeme} without arguments is '
+            'supported only in compatibility mode');
+      } else if (mostRecentStart == null) {
+        regionEndWithoutStart = [];
+      } else {
+        regionNames = mostRecentStart.args;
+      }
+    }
 
     for (final name in regionNames) {
       if (_openExcerpts.remove(name)) {
         // TODO add special marker. For now just end region
       } else {
         final n = name.startsWith("'") ? name : '"$name"';
-        _warn('region $n end without a prior region start');
+        (regionEndWithoutStart ??= []).add(n);
       }
     }
     containsDirectives = true;
+
+    // Warns about end before start for region(s):
+    if (regionEndWithoutStart != null) {
+      final regions = regionEndWithoutStart.join(', ');
+      final s = regions.isEmpty
+          ? ''
+          : regionEndWithoutStart.length > 1 ? 's ($regions)' : ' $regions';
+      _warn('region$s end without a prior start');
+    }
   }
 
   void _excerptStart(String name) {
