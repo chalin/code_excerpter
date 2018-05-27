@@ -71,8 +71,7 @@ void main() {
           abc
         #enddocregion
       ''');
-      excerpter.weave();
-      expect(excerpter.excerpts, {
+      expect(excerpter.weave().excerpts, {
         defaultRegionKey: ['abc']
       });
     });
@@ -84,8 +83,7 @@ void main() {
         #enddocregion a
       ''';
       final excerpter = new Excerpter(uri, content);
-      excerpter.weave();
-      expect(excerpter.excerpts, {
+      expect(excerpter.weave().excerpts, {
         defaultRegionKey: ['          abc'],
         'a': ['abc'],
       });
@@ -102,8 +100,7 @@ void main() {
       #enddocregion b
     ''';
     final excerpter = new Excerpter(uri, content);
-    excerpter.weave();
-    expect(excerpter.excerpts, {
+    expect(excerpter.weave().excerpts, {
       defaultRegionKey: stripDirectives(content),
       'a': ['abc'],
       'b': ['def'],
@@ -120,10 +117,8 @@ void main() {
       #enddocregion a, b
     ''';
     final excerpter = new Excerpter(uri, content);
-    excerpter.weave();
-
     final trimmedLines = ['abc', 'def'];
-    expect(excerpter.excerpts, {
+    expect(excerpter.weave().excerpts, {
       defaultRegionKey: stripDirectives(content),
       'a': trimmedLines,
       'b': trimmedLines,
@@ -136,14 +131,12 @@ void main() {
       group('empty region:', () {
         test('default region', () {
           final excerpter = new Excerpter(uri, '#docregion$eol');
-          excerpter.weave();
-          expect(excerpter.excerpts, {defaultRegionKey: emptyLines});
+          expect(excerpter.weave().excerpts, {defaultRegionKey: emptyLines});
         });
 
         test('region a', () {
           final excerpter = new Excerpter(uri, '#docregion a$eol');
-          excerpter.weave();
-          expect(excerpter.excerpts,
+          expect(excerpter.weave().excerpts,
               {defaultRegionKey: emptyLines, 'a': emptyLines});
         });
       });
@@ -151,8 +144,7 @@ void main() {
       test('region a with lines but no EOL', () {
         final expectedLines = ['abc'];
         final excerpter = new Excerpter(uri, '#docregion a\nabc$eol');
-        excerpter.weave();
-        expect(excerpter.excerpts,
+        expect(excerpter.weave().excerpts,
             {defaultRegionKey: expectedLines, 'a': expectedLines});
       });
     });

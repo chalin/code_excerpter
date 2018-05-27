@@ -26,9 +26,7 @@ class CodeExcerptBuilder implements Builder {
     if (assetId.path.contains('src')) return;
 
     final excerpter = new Excerpter(assetId.path, content);
-    excerpter.weave();
-
-    final yaml = _toYaml(excerpter.excerpts);
+    final yaml = _toYaml(excerpter.weave().excerpts);
     log.info('writing to $outputAssetId');
     buildStep.writeAsString(outputAssetId, yaml);
   }

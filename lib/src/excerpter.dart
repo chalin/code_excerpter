@@ -30,7 +30,7 @@ class Excerpter {
   final Map<String, List<String>> excerpts = newExcerptsMap();
   final Set<String> _openExcerpts = new Set();
 
-  void weave() {
+  Excerpter weave() {
     final lines = content.split(eol);
 
     // Collect the full file in case we need it.
@@ -58,6 +58,7 @@ class Excerpter {
       excerpts[defaultRegionKey] = excerpts[fullFileKey];
       excerpts.remove(fullFileKey);
     }
+    return this;
   }
 
   void _processLine() {
