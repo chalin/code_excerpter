@@ -19,7 +19,22 @@ List<String> contentGeneratingNoExcerpts = [
 
 final emptyLines = new List.unmodifiable([]);
 
+final List<LogRecord> logs = [];
+
+void _expectNoLogs() => expect(logs, []);
+
 void main() {
+  setUpAll(() {
+    logListeners.clear(); // Don't print during tests
+    logListeners.add((r) => logs.add(r));
+  });
+
+  setUp(() => logs.clear());
+
+  // Each individual test must check [logs], and then clear them.
+  // This will catch situations where this is not done.
+  tearDown(_expectNoLogs);
+
   test('helper sanity:', () {
     var content = '''
       #docregion a
@@ -42,6 +57,7 @@ void main() {
         final excerpter = new Excerpter(uri, content);
         excerpter.weave();
         expect(excerpter.excerpts, {});
+        _expectNoLogs();
       });
     }
   });
@@ -52,6 +68,7 @@ void main() {
       final excerpter = new Excerpter(uri, '#docregion\n#enddocregion');
       excerpter.weave();
       expect(excerpter.excerpts, {defaultRegionKey: []});
+      _expectNoLogs();
     });
 
     test('1-line region', () {
@@ -60,6 +77,7 @@ void main() {
       expect(excerpter.excerpts, {
         defaultRegionKey: ['abc']
       });
+      _expectNoLogs();
     });
   });
 
@@ -73,6 +91,7 @@ void main() {
       expect(excerpter.weave().excerpts, {
         defaultRegionKey: ['abc']
       });
+      _expectNoLogs();
     });
 
     test('region a', () {
@@ -86,6 +105,7 @@ void main() {
         defaultRegionKey: ['          abc'],
         'a': ['abc'],
       });
+      _expectNoLogs();
     });
   });
 
@@ -104,6 +124,7 @@ void main() {
       'a': ['abc'],
       'b': ['def'],
     });
+    _expectNoLogs();
   });
 
   test('overlapping regions', () {
@@ -123,6 +144,7 @@ void main() {
       'b': trimmedLines,
       'c': ['abc'],
     });
+    _expectNoLogs();
   });
 
   group('region not closed:', () {
@@ -131,20 +153,23 @@ void main() {
         test('default region', () {
           final excerpter = new Excerpter(uri, '#docregion$eol');
           expect(excerpter.weave().excerpts, {defaultRegionKey: emptyLines});
+          _expectNoLogs();
         });
 
         test('region a', () {
           final excerpter = new Excerpter(uri, '#docregion a$eol');
           expect(excerpter.weave().excerpts,
               {defaultRegionKey: emptyLines, 'a': emptyLines});
+          _expectNoLogs();
         });
       });
 
-      test('region a with lines but no EOL', () {
+      test('region with a line', () {
         final expectedLines = ['abc'];
-        final excerpter = new Excerpter(uri, '#docregion a\nabc$eol');
+        final excerpter = new Excerpter(uri, '#docregion b\nabc$eol');
         expect(excerpter.weave().excerpts,
-            {defaultRegionKey: expectedLines, 'a': expectedLines});
+            {defaultRegionKey: expectedLines, 'b': expectedLines});
+        _expectNoLogs();
       });
     });
   });
@@ -153,15 +178,6 @@ void main() {
 }
 
 void problemCases() {
-  final List<LogRecord> logs = [];
-
-  setUpAll(() {
-    logListeners.clear(); // Don't print during tests
-    logListeners.add((r) => logs.add(r));
-  });
-
-  setUp(() => logs.clear());
-
   group('end before start', () {
     test('default region', () {
       final excerpter = new Excerpter(uri, '#enddocregion');
@@ -170,6 +186,7 @@ void problemCases() {
           contains('region end without a prior start at $uri:1'));
       expect(logs.length, 1);
       expect(excerpter.excerpts, {defaultRegionKey: emptyLines});
+      logs.clear();
     });
 
     test('region a', () {
@@ -181,6 +198,7 @@ void problemCases() {
       expect(excerpter.excerpts, {
         defaultRegionKey: ['abc']
       });
+      logs.clear();
     });
 
     test('region a,b', () {
@@ -192,6 +210,7 @@ void problemCases() {
       expect(excerpter.excerpts, {
         defaultRegionKey: ['abc']
       });
+      logs.clear();
     });
   });
 
@@ -205,6 +224,7 @@ void problemCases() {
       expect(excerpter.excerpts, {
         defaultRegionKey: [],
       });
+      logs.clear();
     });
 
     test('region a', () {
@@ -217,6 +237,7 @@ void problemCases() {
         defaultRegionKey: [],
         'a': [],
       });
+      logs.clear();
     });
   });
 }
