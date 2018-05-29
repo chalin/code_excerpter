@@ -2,9 +2,15 @@ builders:
   code_excerpter:
     import: 'package:code_excerpter/builder.dart'
     builder_factories: [builder]
-    build_extensions: {'': [.yaml]}
+    build_extensions: {'': [.excerpt.yaml]}
     defaults:
       generate_for:
+#        include:
+#          - lib/**
+#          - web/**
+#          - test/**
+#          - example/**
+#          - examples/**
         exclude:
           - '**/.*/**'
           - '**/.DS_Store'

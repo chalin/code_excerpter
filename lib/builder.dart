@@ -8,7 +8,7 @@ import 'package:code_excerpter/src/excerpter.dart';
 Builder builder(BuilderOptions options) => new CodeExcerptBuilder(options);
 
 class CodeExcerptBuilder implements Builder {
-  final outputExtension = '.yaml';
+  final outputExtension = '.excerpt.yaml';
 
   BuilderOptions options;
 
@@ -21,9 +21,6 @@ class CodeExcerptBuilder implements Builder {
 
     final content = await buildStep.readAsString(assetId);
     final outputAssetId = assetId.addExtension(outputExtension);
-
-    // TODO: remove temp code
-    if (assetId.path.contains('src')) return;
 
     final excerpter = new Excerpter(assetId.path, content);
     final yaml = _toYaml(excerpter.weave().excerpts);
