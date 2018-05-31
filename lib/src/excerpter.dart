@@ -23,8 +23,6 @@ class Excerpter {
   int get _lineNum => _lineIdx + 1;
   String get _line => _lines[_lineIdx];
 
-  @nullable
-  Directive mostRecentStart;
   bool containsDirectives = false;
 
   int get numExcerpts => excerpts.length;
@@ -73,13 +71,11 @@ class Excerpter {
     switch (directive?.kind) {
       case Kind.startRegion:
         containsDirectives = true;
-        mostRecentStart = directive;
         _startRegion(directive);
         break;
       case Kind.endRegion:
         containsDirectives = true;
         _endRegion(directive);
-        mostRecentStart = null;
         break;
       default:
         if (directive != null)
@@ -116,23 +112,8 @@ class Excerpter {
     log.finer('_endRegion(regionNames = $regionNames)');
 
     if (regionNames.isEmpty) {
-      if (! /*compatibility mode*/ true) {
-        throw new Exception('${directive.lexeme} without arguments is '
-            'supported only in compatibility mode');
-      } else if (mostRecentStart == null) {
-        _warn('${directive.lexeme} has no explicit arguments; assuming ""');
-        regionNames.add('');
-      } else if (_listEq(mostRecentStart.args, <String>[''])) {
-        regionNames.add('');
-      } else {
-        regionNames = mostRecentStart.args;
-        // FIXME: eventually prohibit this.
-        _warnRegions(
-          regionNames,
-          (regions) =>
-              '${directive.lexeme} has no explicit arguments; assuming implicit $regions',
-        );
-      }
+      regionNames.add('');
+      // _warn('${directive.lexeme} has no explicit arguments; assuming ""');
     }
 
     for (final name in regionNames) {

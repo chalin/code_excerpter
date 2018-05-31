@@ -174,33 +174,6 @@ void main() {
     });
   });
 
-  group('implicitly closed region', () {
-//    test('default region', () {
-//      final expectedLines = ['abc'];
-//      final excerpter = new Excerpter(uri, '#docregion a\nabc\n#enddocregion');
-//      excerpter.weave();
-//      expect(logs[0].message, contains('implicit region a at $uri:3'));
-//      expect(logs.length, 1);
-//      expect(excerpter.excerpts, {
-//        defaultRegionKey: expectedLines,
-//        'a': expectedLines,
-//      });
-//      logs.clear();
-//    });
-
-    test('default region', () {
-      final expectedLines = ['abc'];
-      final excerpter = new Excerpter(uri, '#docregion a\nabc\n#enddocregion');
-      excerpter.weave();
-      expect(logs[0].message, contains('implicit region a at $uri:3'));
-      expect(logs.length, 1);
-      expect(excerpter.excerpts, {
-        defaultRegionKey: expectedLines,
-        'a': expectedLines,
-      });
-      logs.clear();
-    });  });
-
   group('problems:', problemCases);
 }
 
@@ -209,9 +182,9 @@ void problemCases() {
     test('default region', () {
       final excerpter = new Excerpter(uri, '#enddocregion');
       excerpter.weave();
-      expect(logs[1].message,
+      expect(logs[0].message,
           contains('region "" end without a prior start at $uri:1'));
-      // expect(logs.length, 1);
+      expect(logs.length, 1);
       expect(excerpter.excerpts, {defaultRegionKey: emptyLines});
       logs.clear();
     });
@@ -236,6 +209,20 @@ void problemCases() {
       expect(logs.length, 1);
       expect(excerpter.excerpts, {
         defaultRegionKey: ['abc']
+      });
+      logs.clear();
+    });
+
+    test('start a end default region', () {
+      final expectedLines = ['abc'];
+      final excerpter = new Excerpter(uri, '#docregion a\nabc\n#enddocregion');
+      excerpter.weave();
+      expect(logs[0].message,
+          contains('region "" end without a prior start at $uri:3'));
+      expect(logs.length, 1);
+      expect(excerpter.excerpts, {
+        defaultRegionKey: expectedLines,
+        'a': expectedLines,
       });
       logs.clear();
     });
