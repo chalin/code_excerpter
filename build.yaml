@@ -21,3 +21,5 @@ builders:
           - '**/*.jpeg'
           - '**/*.png'
           - '**/*.tiff'
+          - '**/*.zip'
+          - '**/*.gzip'

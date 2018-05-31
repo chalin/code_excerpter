@@ -25,8 +25,10 @@ class CodeExcerptBuilder implements Builder {
     final excerpter = new Excerpter(assetId.path, content);
     final yaml = _toYaml(excerpter.weave().excerpts);
     if (yaml.isNotEmpty) {
-      log.info('writing to $outputAssetId');
-      buildStep.writeAsString(outputAssetId, yaml);
+      await buildStep.writeAsString(outputAssetId, yaml);
+      log.info('wrote $outputAssetId');
+    } else {
+      // log.warning(' $outputAssetId has no excerpts');
     }
   }
 

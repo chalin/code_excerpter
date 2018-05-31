@@ -1,4 +1,5 @@
 import 'package:code_excerpter/src/util/line.dart';
+import 'package:collection/collection.dart';
 
 import 'directive.dart';
 import 'util/logging.dart';
@@ -7,6 +8,8 @@ import 'nullable.dart';
 /// Key used for excerpt representing the entire file w/o directives
 const fullFileKey = '\u0000';
 const defaultRegionKey = '';
+
+Function _listEq = const ListEquality().equals;
 
 Map<String, List<String>> newExcerptsMap() => new Map();
 
@@ -76,6 +79,7 @@ class Excerpter {
       case Kind.endRegion:
         containsDirectives = true;
         _endRegion(directive);
+        mostRecentStart = null;
         break;
       default:
         if (directive != null)
@@ -101,7 +105,7 @@ class Excerpter {
 
     _warnRegions(
       regionAlreadyStarted,
-          (regions) => 'repeated start for $regions',
+      (regions) => 'repeated start for $regions',
     );
   }
 
@@ -116,9 +120,18 @@ class Excerpter {
         throw new Exception('${directive.lexeme} without arguments is '
             'supported only in compatibility mode');
       } else if (mostRecentStart == null) {
-        regionsWithoutStart = [];
+        _warn('${directive.lexeme} has no explicit arguments; assuming ""');
+        regionNames.add('');
+      } else if (_listEq(mostRecentStart.args, <String>[''])) {
+        regionNames.add('');
       } else {
         regionNames = mostRecentStart.args;
+        // FIXME: eventually prohibit this.
+        _warnRegions(
+          regionNames,
+          (regions) =>
+              '${directive.lexeme} has no explicit arguments; assuming implicit $regions',
+        );
       }
     }
 
