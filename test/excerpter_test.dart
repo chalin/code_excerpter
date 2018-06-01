@@ -155,8 +155,7 @@ void problemCases() {
   test('empty region', () {
     final excerpter = new Excerpter(uri, '#docregion\n#enddocregion');
     excerpter.weave();
-    expect(logs[0].message,
-        contains('empty region at $uri:2'));
+    expect(logs[0].message, contains('empty region at $uri:2'));
     expect(logs.length, 1);
     expect(excerpter.excerpts, {defaultRegionKey: []});
     logs.clear();

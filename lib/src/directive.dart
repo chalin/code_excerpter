@@ -7,8 +7,8 @@ import 'nullable.dart';
 /// - CSS and Java-like languages: `*/`
 /// - HTML: `-->`
 ///
-final _directiveRegEx =
-    new RegExp(r'^(\s*)(\S.*?)?#((?:end)?docregion)\b\s*(.*?)(?:\s*(?:-->|\*\/))?\s*$');
+final _directiveRegEx = new RegExp(
+    r'^(\s*)(\S.*?)?#((?:end)?docregion)\b\s*(.*?)(?:\s*(?:-->|\*\/))?\s*$');
 
 final _argSeparator = new RegExp(r'\s*,\s*');
 
