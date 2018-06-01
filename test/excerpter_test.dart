@@ -64,13 +64,6 @@ void main() {
 
   // Independent of indentation
   group('basic delimited default region:', () {
-    test('empty region', () {
-      final excerpter = new Excerpter(uri, '#docregion\n#enddocregion');
-      excerpter.weave();
-      expect(excerpter.excerpts, {defaultRegionKey: []});
-      _expectNoLogs();
-    });
-
     test('1-line region', () {
       final excerpter = new Excerpter(uri, '#docregion\nabc\n#enddocregion');
       excerpter.weave();
@@ -127,26 +120,6 @@ void main() {
     _expectNoLogs();
   });
 
-  test('overlapping regions', () {
-    var content = '''
-      #docregion a,b,c
-        abc
-      #enddocregion b, c
-      #docregion b
-        def
-      #enddocregion a, b
-    ''';
-    final excerpter = new Excerpter(uri, content);
-    final trimmedLines = ['abc', 'def'];
-    expect(excerpter.weave().excerpts, {
-      defaultRegionKey: stripDirectives(content),
-      'a': trimmedLines,
-      'b': trimmedLines,
-      'c': ['abc'],
-    });
-    _expectNoLogs();
-  });
-
   group('region not closed:', () {
     ['', '\n'].forEach((eol) {
       group('empty region:', () {
@@ -175,9 +148,19 @@ void main() {
   });
 
   group('problems:', problemCases);
+  group('plaster:', plasterCases);
 }
 
 void problemCases() {
+  test('empty region', () {
+    final excerpter = new Excerpter(uri, '#docregion\n#enddocregion');
+    excerpter.weave();
+    expect(logs[0].message, contains('empty region at $uri:2'));
+    expect(logs.length, 1);
+    expect(excerpter.excerpts, {defaultRegionKey: []});
+    logs.clear();
+  });
+
   group('end before start', () {
     test('default region', () {
       final excerpter = new Excerpter(uri, '#enddocregion');
@@ -253,6 +236,64 @@ void problemCases() {
       });
       logs.clear();
     });
+  });
+}
+
+void plasterCases() {
+  test('region a with 1 plaster', () {
+    var content = '''
+      #docregion a
+      abc
+      #enddocregion a
+      123
+      #docregion a
+      def
+      #enddocregion a
+    ''';
+    final excerpter = new Excerpter(uri, content);
+    expect(excerpter.weave().excerpts, {
+      defaultRegionKey: stripDirectives(content),
+      'a': ['abc', defaultPlaster, 'def'],
+    });
+    _expectNoLogs();
+  });
+
+  test('overlapping regions', () {
+    var content = '''
+      #docregion a,b,c
+      abc
+      #enddocregion b, c
+      #docregion b
+      def
+      #enddocregion a, b
+    ''';
+    final excerpter = new Excerpter(uri, content);
+    expect(excerpter.weave().excerpts, {
+      defaultRegionKey: stripDirectives(content),
+      'a': ['abc', 'def'],
+      'b': ['abc', defaultPlaster, 'def'],
+      'c': ['abc'],
+    });
+    _expectNoLogs();
+  });
+
+  test('plaster with different indentations', () {
+    var content = '''
+      #docregion a,b,c
+      abc
+        #enddocregion b, c
+      #docregion b
+      def
+      #enddocregion a, b
+    ''';
+    final excerpter = new Excerpter(uri, content);
+    expect(excerpter.weave().excerpts, {
+      defaultRegionKey: stripDirectives(content),
+      'a': ['abc', 'def'],
+      'b': ['abc', '  $defaultPlaster', 'def'],
+      'c': ['abc'],
+    });
+    _expectNoLogs();
   });
 }
 
