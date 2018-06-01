@@ -27,10 +27,12 @@ void main() {
   // Leading and trailing text is ignored
   group('context insenstivie', () {
     test(Kind.startRegion, () {
-      final d = new Directive.tryParse(' // #docregion');
+      final spaces = '  ';
+      final d = new Directive.tryParse('$spaces// #docregion');
       expect(d.kind, Kind.startRegion);
       expect(d.rawArgs, '');
       expect(d.args, []);
+      expect(d.indentation, spaces);
     });
 
     test(Kind.endRegion, () {
@@ -38,6 +40,7 @@ void main() {
       expect(d.kind, Kind.endRegion);
       expect(d.rawArgs, 'a,b,  c');
       expect(d.args, ['a', 'b', 'c']);
+      expect(d.indentation, ' ');
     });
   });
 
@@ -48,6 +51,7 @@ void main() {
         expect(d.kind, Kind.startRegion);
         expect(d.rawArgs, '');
         expect(d.args, []);
+        expect(d.indentation, '');
       });
 
       test(Kind.endRegion, () {
@@ -55,6 +59,7 @@ void main() {
         expect(d.kind, Kind.endRegion);
         expect(d.rawArgs, 'a');
         expect(d.args, ['a']);
+        expect(d.indentation, '');
       });
     });
 
@@ -64,6 +69,7 @@ void main() {
         expect(d.kind, Kind.startRegion);
         expect(d.rawArgs, '');
         expect(d.args, []);
+        expect(d.indentation, '');
       });
 
       test(Kind.endRegion, () {
@@ -71,6 +77,7 @@ void main() {
         expect(d.kind, Kind.endRegion);
         expect(d.rawArgs, 'a');
         expect(d.args, ['a']);
+        expect(d.indentation, '');
       });
     });
   });

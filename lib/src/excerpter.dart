@@ -8,6 +8,7 @@ import 'nullable.dart';
 /// Key used for excerpt representing the entire file w/o directives
 const fullFileKey = '\u0000';
 const defaultRegionKey = '';
+const defaultPlaster = '···';
 
 Function _listEq = const ListEquality().equals;
 
@@ -46,6 +47,7 @@ class Excerpter {
     // Normalize indentation for all but the full file.
     for (final name in excerpts.keys) {
       dropTrailingBlankLines(excerpts[name]);
+      _dropTrailingPlaster(excerpts[name]);
       if (name == fullFileKey) continue;
       excerpts[name] = maxUnindent(excerpts[name]);
     }
@@ -118,7 +120,13 @@ class Excerpter {
 
     for (final name in regionNames) {
       if (_openExcerpts.remove(name)) {
-        // TODO add special marker. For now just end region
+        if (excerpts[name].isEmpty) {
+          _warnRegions(
+            [name],
+            (regions) => 'empty $regions',
+          );
+        }
+        excerpts[name].add(directive.indentation + defaultPlaster);
       } else {
         (regionsWithoutStart ??= []).add(_quoteName(name));
       }
@@ -157,4 +165,9 @@ class Excerpter {
 
   /// Quote a region name if it isn't already quoted.
   String _quoteName(String name) => name.startsWith("'") ? name : '"$name"';
+
+  void _dropTrailingPlaster(List<String> excerpt) {
+    if (excerpt.isEmpty || !excerpt.last.contains(defaultPlaster)) return;
+    excerpt.removeLast();
+  }
 }
