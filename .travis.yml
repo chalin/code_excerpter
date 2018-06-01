@@ -1,0 +1,20 @@
+language: dart
+
+dart: dev
+
+env:
+  global:
+    - LIBS="lib test"
+
+dart_task:
+ - dartanalyzer: --fatal-warnings $LIBS
+ - dartfmt: -n $LIBS
+ - test
+
+cache:
+  directories:
+    - $HOME/.pub-cache
+
+# Only run Travis jobs for named branches (to avoid double builds for each PR)
+branches:
+  only: [master, /^\d(\.x|-dev)$/, /travis-build/]
