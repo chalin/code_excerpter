@@ -42,7 +42,7 @@ class Directive {
   /// Raw string corresponding to the directive's arguments
   String get rawArgs => _match[4];
 
-  List<String> get args  => _args;
+  List<String> get args => _args;
 
   @nullable
   factory Directive.tryParse(String line) {
@@ -58,10 +58,14 @@ class Directive {
   List<String> _uniqueArgs() {
     final argsMaybeWithDups = _parseArgs();
     final argCount = new Map<String, int>();
-    for(final arg in argsMaybeWithDups) {
+    for (var arg in argsMaybeWithDups) {
+      if (arg.isEmpty) {
+        issues.add('unquoted default region name is deprecated');
+      } else if (arg == "''") {
+        arg = '';
+      }
       argCount[arg] ??= 0;
-      if(++argCount[arg] == 2)
-        issues.add('repeated argument "$arg"');
+      if (++argCount[arg] == 2) issues.add('repeated argument "$arg"');
     }
     return argCount.keys.toList();
   }

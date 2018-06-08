@@ -85,7 +85,7 @@ class Excerpter {
         _endRegion(directive);
         break;
       default:
-          throw new Exception('Unimplemented directive: $_line');
+        throw new Exception('Unimplemented directive: $_line');
     }
   }
 

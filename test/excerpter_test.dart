@@ -235,12 +235,24 @@ void problemCases() {
   });
 
   group('directives:', () {
+    test('warn unquoted default region name', () {
+      final excerpter = new Excerpter(uri, '#docregion ,a');
+      excerpter.weave();
+      expect(logs.length, 1);
+      expect(logs[0].message,
+          contains('unquoted default region name is deprecated at $uri:1'));
+      expect(excerpter.excerpts, {
+        defaultRegionKey: [],
+        'a': [],
+      });
+      logs.clear();
+    });
+
     test('dup "a" region', () {
       final excerpter = new Excerpter(uri, '#docregion a,a');
       excerpter.weave();
       expect(logs.length, 1);
-      expect(
-          logs[0].message, contains('repeated argument "a" at $uri:1'));
+      expect(logs[0].message, contains('repeated argument "a" at $uri:1'));
       expect(excerpter.excerpts, {
         defaultRegionKey: [],
         'a': [],

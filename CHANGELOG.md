@@ -1,8 +1,10 @@
 # Changelog
 
-## 0.1.1
+## 0.2.0
 
-- Support checking for repeated region name.
+- Support quoted default region name `''`, and deprecate
+  unquoted default region name usage.
+- Warn about repeated region names.
 
 ## 0.1.0
 

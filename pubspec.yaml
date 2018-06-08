@@ -1,5 +1,5 @@
 name: code_excerpter
-version: 0.1.1
+version: 0.2.0
 description: A line-based utility for extracting code regions.
 
 author: Patrice Chalin <pchalin@gmail.com>
