@@ -3,10 +3,6 @@ import 'package:code_excerpter/src/util/logging.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
-/* TODO:
-- Regions with plaster markers
- */
-
 // Mock URI used for all content origins.
 final uri = 'foo';
 
@@ -155,8 +151,8 @@ void problemCases() {
   test('empty region', () {
     final excerpter = new Excerpter(uri, '#docregion\n#enddocregion');
     excerpter.weave();
-    expect(logs[0].message, contains('empty region at $uri:2'));
     expect(logs.length, 1);
+    expect(logs[0].message, contains('empty region at $uri:2'));
     expect(excerpter.excerpts, {defaultRegionKey: []});
     logs.clear();
   });
@@ -165,9 +161,9 @@ void problemCases() {
     test('default region', () {
       final excerpter = new Excerpter(uri, '#enddocregion');
       excerpter.weave();
+      expect(logs.length, 1);
       expect(logs[0].message,
           contains('region "" end without a prior start at $uri:1'));
-      expect(logs.length, 1);
       expect(excerpter.excerpts, {defaultRegionKey: emptyLines});
       logs.clear();
     });
@@ -175,9 +171,9 @@ void problemCases() {
     test('region a', () {
       final excerpter = new Excerpter(uri, 'abc\n#enddocregion a');
       excerpter.weave();
+      expect(logs.length, 1);
       expect(logs[0].message,
           contains('region "a" end without a prior start at $uri:2'));
-      expect(logs.length, 1);
       expect(excerpter.excerpts, {
         defaultRegionKey: ['abc']
       });
@@ -187,9 +183,9 @@ void problemCases() {
     test('region a,b', () {
       final excerpter = new Excerpter(uri, 'abc\n#enddocregion a,b');
       excerpter.weave();
+      expect(logs.length, 1);
       expect(logs[0].message,
           contains('regions ("a", "b") end without a prior start at $uri:2'));
-      expect(logs.length, 1);
       expect(excerpter.excerpts, {
         defaultRegionKey: ['abc']
       });
@@ -200,9 +196,9 @@ void problemCases() {
       final expectedLines = ['abc'];
       final excerpter = new Excerpter(uri, '#docregion a\nabc\n#enddocregion');
       excerpter.weave();
+      expect(logs.length, 1);
       expect(logs[0].message,
           contains('region "" end without a prior start at $uri:3'));
-      expect(logs.length, 1);
       expect(excerpter.excerpts, {
         defaultRegionKey: expectedLines,
         'a': expectedLines,
@@ -215,9 +211,9 @@ void problemCases() {
     test('default region', () {
       final excerpter = new Excerpter(uri, '#docregion\n#docregion');
       excerpter.weave();
+      expect(logs.length, 1);
       expect(
           logs[0].message, contains('repeated start for region "" at $uri:2'));
-      expect(logs.length, 1);
       expect(excerpter.excerpts, {
         defaultRegionKey: [],
       });
@@ -227,9 +223,24 @@ void problemCases() {
     test('region a', () {
       final excerpter = new Excerpter(uri, '#docregion a\n#docregion a');
       excerpter.weave();
+      expect(logs.length, 1);
       expect(
           logs[0].message, contains('repeated start for region "a" at $uri:2'));
+      expect(excerpter.excerpts, {
+        defaultRegionKey: [],
+        'a': [],
+      });
+      logs.clear();
+    });
+  });
+
+  group('directives:', () {
+    test('dup "a" region', () {
+      final excerpter = new Excerpter(uri, '#docregion a,a');
+      excerpter.weave();
       expect(logs.length, 1);
+      expect(
+          logs[0].message, contains('repeated argument "a" at $uri:1'));
       expect(excerpter.excerpts, {
         defaultRegionKey: [],
         'a': [],

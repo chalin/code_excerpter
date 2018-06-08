@@ -1,5 +1,4 @@
 import 'package:code_excerpter/src/util/line.dart';
-import 'package:collection/collection.dart';
 
 import 'directive.dart';
 import 'util/logging.dart';
@@ -9,8 +8,6 @@ import 'nullable.dart';
 const fullFileKey = '\u0000';
 const defaultRegionKey = '';
 const defaultPlaster = '···';
-
-Function _listEq = const ListEquality().equals;
 
 Map<String, List<String>> newExcerptsMap() => new Map();
 
@@ -70,7 +67,15 @@ class Excerpter {
   void _processLine() {
     final directive = new Directive.tryParse(_line);
 
-    switch (directive?.kind) {
+    if (directive == null) {
+      // Add line to open regions
+      _openExcerpts.forEach((name) => excerpts[name].add(_line));
+      return;
+    }
+
+    directive.issues.forEach((issue) => _warn(issue));
+
+    switch (directive.kind) {
       case Kind.startRegion:
         containsDirectives = true;
         _startRegion(directive);
@@ -80,11 +85,7 @@ class Excerpter {
         _endRegion(directive);
         break;
       default:
-        if (directive != null)
           throw new Exception('Unimplemented directive: $_line');
-
-        // Add line to open regions:
-        _openExcerpts.forEach((name) => excerpts[name].add(_line));
     }
   }
 
