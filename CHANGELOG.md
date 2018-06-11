@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0
+
+- Change base config so that the builder applies to all packages
+  (via `auto_apply: all_packages`).
+
 ## 0.2.0
 
 - Support quoted default region name `''`, and deprecate
