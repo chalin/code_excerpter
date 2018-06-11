@@ -1,25 +1,29 @@
 builders:
   code_excerpter:
     import: 'package:code_excerpter/builder.dart'
+    auto_apply: all_packages
     builder_factories: [builder]
     build_extensions: {'': [.excerpt.yaml]}
     defaults:
       generate_for:
-#        include:
-#          - lib/**
-#          - web/**
-#          - test/**
-#          - example/**
-#          - examples/**
+        include:
+          - lib/**
+          - web/**
+          - test/**
+          - example/**
+          - examples/**
         exclude:
           - '**/.*/**'
           - '**/.DS_Store'
           - '**/build/**'
           - '**/node_modules/**'
           - '**/*.bmp'
+          - '**/*.cur'
+          - '**/*.ico'
           - '**/*.jpg'
           - '**/*.jpeg'
           - '**/*.png'
+          - '**/*.sum'
           - '**/*.tiff'
           - '**/*.zip'
           - '**/*.gzip'

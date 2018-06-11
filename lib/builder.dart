@@ -17,7 +17,7 @@ class CodeExcerptBuilder implements Builder {
   @override
   Future<void> build(BuildStep buildStep) async {
     AssetId assetId = buildStep.inputId;
-    if (assetId.path.endsWith(r'$')) return;
+    if (assetId.package.startsWith(r'$') || assetId.path.endsWith(r'$')) return;
 
     final content = await buildStep.readAsString(assetId);
     final outputAssetId = assetId.addExtension(outputExtension);
