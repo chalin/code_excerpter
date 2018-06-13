@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1
+
+- Fix type error.
+- Set min SDK to 2.0.0-dev.62
+
 ## 0.3.0
 
 - Change base config so that the builder applies to all packages
