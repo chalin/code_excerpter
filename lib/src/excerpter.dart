@@ -46,7 +46,7 @@ class Excerpter {
       dropTrailingBlankLines(excerpts[name]);
       _dropTrailingPlaster(excerpts[name]);
       if (name == fullFileKey) continue;
-      excerpts[name] = maxUnindent(excerpts[name]);
+      excerpts[name] = maxUnindent(excerpts[name]).toList();
     }
 
     // Final adjustment to excerpts relative to fullFileKey:
