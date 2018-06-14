@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1+1
+
+- Set min SDK to 2.0.0-dev.61
+
 ## 0.3.1
 
 - Fix type error.
