@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.3.1+1
+## 0.3.1+1, +2
 
-- Set min SDK to 2.0.0-dev.61
+- Set min SDK to 2.0.0-dev.61 and other package version downgrades.
 
 ## 0.3.1
 
