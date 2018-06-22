@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0
+
+- Set min SDK to 2.0.0-dev.64.1 and upgrade `test` to 1.0.0.
+
 ## 0.3.1+1, +2
 
 - Set min SDK to 2.0.0-dev.61 and other package version downgrades.
