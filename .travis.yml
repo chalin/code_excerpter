@@ -11,6 +11,9 @@ dart_task:
  - dartfmt: -n $LIBS
  - test
 
+script:
+ - tool/builder_test.sh
+
 cache:
   directories:
     - $HOME/.pub-cache
