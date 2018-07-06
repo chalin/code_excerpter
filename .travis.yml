@@ -6,13 +6,32 @@ env:
   global:
     - LIBS="lib test"
 
-dart_task:
- - dartanalyzer: --fatal-warnings $LIBS
- - dartfmt: -n $LIBS
- - test
+#dart_task:
+# - dartanalyzer: --fatal-warnings $LIBS
+# - dartfmt: -n $LIBS
+# - test
 
-script:
- - tool/builder_test.sh
+jobs:
+  include:
+    - env: TASK=dartanalyzer
+      script:
+      - pub get
+      - $TASK --fatal-warnings $LIBS analysis_options.yaml
+
+    - env: TASK=dartfmt
+      script:
+      - pub get
+      - $TASK -n $LIBS
+
+    - env: TASK=pub run test
+      script:
+      - pub get
+      - $TASK
+
+    - env: TASK=tool/builder_test.sh
+      script:
+      - pub get
+      - $TASK
 
 cache:
   directories:
