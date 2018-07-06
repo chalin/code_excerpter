@@ -7,11 +7,11 @@ builders:
     defaults:
       generate_for:
         include:
-          - lib/**
-          - web/**
-          - test/**
           - example/**
           - examples/**
+          - lib/**
+          - test/**
+          - web/**
         exclude:
           - '**/.*/**'
           - '**/.DS_Store'

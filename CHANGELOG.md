@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.1
+
+- Updated README to explain usage, syntax, etc.
+- Set min SDK to 2.0.0-dev.67.0 and upgrade `build_runner` to 0.9.0.
+
 ## 0.4.0
 
 - Set min SDK to 2.0.0-dev.64.1 and upgrade `test` to 1.0.0.
