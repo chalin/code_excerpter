@@ -6,7 +6,7 @@ author: Patrice Chalin <pchalin@gmail.com>
 homepage: https://github.com/chalin/code_excerpt_updater
 
 environment:
-  sdk: '>=2.0.0-dev.67.0 <2.0.0'
+  sdk: '>=2.0.0-dev.68.0 <3.0.0'
 
 dependencies:
   build: ^0.12.0

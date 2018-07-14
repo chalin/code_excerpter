@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0
+
+- Set max SDK version to <3.0.0.
+
 ## 0.4.1
 
 - Updated README to explain usage, syntax, etc.
