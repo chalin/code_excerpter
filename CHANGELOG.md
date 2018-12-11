@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0
+
+- Upgrade to v1 of `builder` and `build_runner`.
+
 ## 0.5.0
 
 - Set max SDK version to <3.0.0.
