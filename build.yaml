@@ -13,6 +13,7 @@ builders:
           - test/**
           - web/**
         exclude:
+          - '**/.*'
           - '**/.*/**'
           - '**/.DS_Store'
           - '**/build/**'
