@@ -1,6 +1,6 @@
 language: dart
 
-dart: dev
+dart: stable
 
 env:
   global:
