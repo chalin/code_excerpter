@@ -6,7 +6,7 @@ import 'package:yaml/yaml.dart';
 
 void main() {
   test('build.yaml build_extensions matches Builder', () {
-    final buildYamlFile = new File('build.yaml');
+    final buildYamlFile = File('build.yaml');
     final content = buildYamlFile.readAsStringSync();
     Map yaml = loadYaml(content);
     Map builders = yaml['builders'];

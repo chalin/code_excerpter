@@ -7,10 +7,10 @@ import 'nullable.dart';
 /// - CSS and Java-like languages: `*/`
 /// - HTML: `-->`
 ///
-final _directiveRegEx = new RegExp(
+final _directiveRegEx = RegExp(
     r'^(\s*)(\S.*?)?#((?:end)?docregion)\b\s*(.*?)(?:\s*(?:-->|\*\/))?\s*$');
 
-final _argSeparator = new RegExp(r'\s*,\s*');
+final _argSeparator = RegExp(r'\s*,\s*');
 
 /// Represents a code-excerpter directive (both the model and lexical elements)
 class Directive {
@@ -51,13 +51,13 @@ class Directive {
 
     final lexeme = match[_lexemeIndex];
     final kind = tryParseKind(lexeme);
-    return kind == null ? null : new Directive._(kind, match);
+    return kind == null ? null : Directive._(kind, match);
   }
 
   /// Pushes 'repeated argument' issues to [issues].
   List<String> _uniqueArgs() {
     final argsMaybeWithDups = _parseArgs();
-    final argCount = new Map<String, int>();
+    final argCount = Map<String, int>();
     for (var arg in argsMaybeWithDups) {
       if (arg.isEmpty) {
         issues.add('unquoted default region name is deprecated');

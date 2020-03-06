@@ -9,7 +9,7 @@ const fullFileKey = '\u0000';
 const defaultRegionKey = '';
 const defaultPlaster = '···';
 
-Map<String, List<String>> newExcerptsMap() => new Map();
+Map<String, List<String>> newExcerptsMap() => Map();
 
 class Excerpter {
   final String uri;
@@ -30,7 +30,7 @@ class Excerpter {
         _lineIdx = 0;
 
   final Map<String, List<String>> excerpts = newExcerptsMap();
-  final Set<String> _openExcerpts = new Set();
+  final Set<String> _openExcerpts = Set();
 
   Excerpter weave() {
     final lines = content.split(eol);
@@ -65,7 +65,7 @@ class Excerpter {
   }
 
   void _processLine() {
-    final directive = new Directive.tryParse(_line);
+    final directive = Directive.tryParse(_line);
 
     if (directive == null) {
       // Add line to open regions
@@ -85,7 +85,7 @@ class Excerpter {
         _endRegion(directive);
         break;
       default:
-        throw new Exception('Unimplemented directive: $_line');
+        throw Exception('Unimplemented directive: $_line');
     }
   }
 

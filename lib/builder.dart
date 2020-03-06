@@ -5,7 +5,7 @@ import 'package:build/build.dart';
 import 'package:code_excerpter/src/util/line.dart';
 import 'package:code_excerpter/src/excerpter.dart';
 
-Builder builder(BuilderOptions options) => new CodeExcerptBuilder(options);
+Builder builder(BuilderOptions options) => CodeExcerptBuilder(options);
 
 class CodeExcerptBuilder implements Builder {
   final outputExtension = '.excerpt.yaml';
@@ -22,7 +22,7 @@ class CodeExcerptBuilder implements Builder {
     final content = await buildStep.readAsString(assetId);
     final outputAssetId = assetId.addExtension(outputExtension);
 
-    final excerpter = new Excerpter(assetId.path, content);
+    final excerpter = Excerpter(assetId.path, content);
     final yaml = _toYaml(excerpter.weave().excerpts);
     if (yaml.isNotEmpty) {
       await buildStep.writeAsString(outputAssetId, yaml);
@@ -38,7 +38,7 @@ class CodeExcerptBuilder implements Builder {
       };
 
   String _toYaml(Map<String, List<String>> excerpts) {
-    final StringBuffer s = new StringBuffer();
+    final StringBuffer s = StringBuffer();
 
     excerpts.forEach((name, lines) {
       s.writeln(_yamlEntry(name, lines));
