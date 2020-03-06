@@ -14,7 +14,7 @@ import 'package:logging/logging.dart';
 Logger _logger;
 
 const _buildLogKey = #buildLog;
-final _default = new Logger('package:code_excerpter');
+final _default = Logger('package:code_excerpter');
 
 /// Initial logging level. It must be set before calling [log].
 Level initLevel = Level.FINE;

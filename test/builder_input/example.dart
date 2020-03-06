@@ -14,6 +14,6 @@ void main() async {
 // #enddocregion main, main-stub
 
 /// Generates a stream of increasingly accurate estimates of π.
-Stream<double> computePi({int batch: 100000}) async* {
+Stream<double> computePi({int batch = 100000}) async* {
   // ...
 }

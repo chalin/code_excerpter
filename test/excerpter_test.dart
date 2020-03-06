@@ -13,7 +13,7 @@ List<String> contentGeneratingNoExcerpts = [
   'docregion', // Without leading #
 ];
 
-final emptyLines = new List.unmodifiable([]);
+final emptyLines = List.unmodifiable([]);
 
 final List<LogRecord> logs = [];
 
@@ -50,7 +50,7 @@ void main() {
     for (final content in contentGeneratingNoExcerpts) {
       final testName = "'${content.replaceAll('\n', '\\n')}'";
       test(testName, () {
-        final excerpter = new Excerpter(uri, content);
+        final excerpter = Excerpter(uri, content);
         excerpter.weave();
         expect(excerpter.excerpts, {});
         _expectNoLogs();
@@ -61,7 +61,7 @@ void main() {
   // Independent of indentation
   group('basic delimited default region:', () {
     test('1-line region', () {
-      final excerpter = new Excerpter(uri, '#docregion\nabc\n#enddocregion');
+      final excerpter = Excerpter(uri, '#docregion\nabc\n#enddocregion');
       excerpter.weave();
       expect(excerpter.excerpts, {
         defaultRegionKey: ['abc']
@@ -72,7 +72,7 @@ void main() {
 
   group('normalized indentation:', () {
     test('default region', () {
-      final excerpter = new Excerpter(uri, '''
+      final excerpter = Excerpter(uri, '''
         #docregion
           abc
         #enddocregion
@@ -89,7 +89,7 @@ void main() {
           abc
         #enddocregion a
       ''';
-      final excerpter = new Excerpter(uri, content);
+      final excerpter = Excerpter(uri, content);
       expect(excerpter.weave().excerpts, {
         defaultRegionKey: ['          abc'],
         'a': ['abc'],
@@ -107,7 +107,7 @@ void main() {
         def
       #enddocregion b
     ''';
-    final excerpter = new Excerpter(uri, content);
+    final excerpter = Excerpter(uri, content);
     expect(excerpter.weave().excerpts, {
       defaultRegionKey: stripDirectives(content),
       'a': ['abc'],
@@ -120,13 +120,13 @@ void main() {
     ['', '\n'].forEach((eol) {
       group('empty region:', () {
         test('default region', () {
-          final excerpter = new Excerpter(uri, '#docregion$eol');
+          final excerpter = Excerpter(uri, '#docregion$eol');
           expect(excerpter.weave().excerpts, {defaultRegionKey: emptyLines});
           _expectNoLogs();
         });
 
         test('region a', () {
-          final excerpter = new Excerpter(uri, '#docregion a$eol');
+          final excerpter = Excerpter(uri, '#docregion a$eol');
           expect(excerpter.weave().excerpts,
               {defaultRegionKey: emptyLines, 'a': emptyLines});
           _expectNoLogs();
@@ -135,7 +135,7 @@ void main() {
 
       test('region with a line', () {
         final expectedLines = ['abc'];
-        final excerpter = new Excerpter(uri, '#docregion b\nabc$eol');
+        final excerpter = Excerpter(uri, '#docregion b\nabc$eol');
         expect(excerpter.weave().excerpts,
             {defaultRegionKey: expectedLines, 'b': expectedLines});
         _expectNoLogs();
@@ -149,7 +149,7 @@ void main() {
 
 void problemCases() {
   test('empty region', () {
-    final excerpter = new Excerpter(uri, '#docregion\n#enddocregion');
+    final excerpter = Excerpter(uri, '#docregion\n#enddocregion');
     excerpter.weave();
     expect(logs.length, 1);
     expect(logs[0].message, contains('empty region at $uri:2'));
@@ -159,7 +159,7 @@ void problemCases() {
 
   group('end before start', () {
     test('default region', () {
-      final excerpter = new Excerpter(uri, '#enddocregion');
+      final excerpter = Excerpter(uri, '#enddocregion');
       excerpter.weave();
       expect(logs.length, 1);
       expect(logs[0].message,
@@ -169,7 +169,7 @@ void problemCases() {
     });
 
     test('region a', () {
-      final excerpter = new Excerpter(uri, 'abc\n#enddocregion a');
+      final excerpter = Excerpter(uri, 'abc\n#enddocregion a');
       excerpter.weave();
       expect(logs.length, 1);
       expect(logs[0].message,
@@ -181,7 +181,7 @@ void problemCases() {
     });
 
     test('region a,b', () {
-      final excerpter = new Excerpter(uri, 'abc\n#enddocregion a,b');
+      final excerpter = Excerpter(uri, 'abc\n#enddocregion a,b');
       excerpter.weave();
       expect(logs.length, 1);
       expect(logs[0].message,
@@ -194,7 +194,7 @@ void problemCases() {
 
     test('start a end default region', () {
       final expectedLines = ['abc'];
-      final excerpter = new Excerpter(uri, '#docregion a\nabc\n#enddocregion');
+      final excerpter = Excerpter(uri, '#docregion a\nabc\n#enddocregion');
       excerpter.weave();
       expect(logs.length, 1);
       expect(logs[0].message,
@@ -209,7 +209,7 @@ void problemCases() {
 
   group('repeated start:', () {
     test('default region', () {
-      final excerpter = new Excerpter(uri, '#docregion\n#docregion');
+      final excerpter = Excerpter(uri, '#docregion\n#docregion');
       excerpter.weave();
       expect(logs.length, 1);
       expect(
@@ -221,7 +221,7 @@ void problemCases() {
     });
 
     test('region a', () {
-      final excerpter = new Excerpter(uri, '#docregion a\n#docregion a');
+      final excerpter = Excerpter(uri, '#docregion a\n#docregion a');
       excerpter.weave();
       expect(logs.length, 1);
       expect(
@@ -236,7 +236,7 @@ void problemCases() {
 
   group('directives:', () {
     test('warn unquoted default region name', () {
-      final excerpter = new Excerpter(uri, '#docregion ,a');
+      final excerpter = Excerpter(uri, '#docregion ,a');
       excerpter.weave();
       expect(logs.length, 1);
       expect(logs[0].message,
@@ -249,7 +249,7 @@ void problemCases() {
     });
 
     test('dup "a" region', () {
-      final excerpter = new Excerpter(uri, '#docregion a,a');
+      final excerpter = Excerpter(uri, '#docregion a,a');
       excerpter.weave();
       expect(logs.length, 1);
       expect(logs[0].message, contains('repeated argument "a" at $uri:1'));
@@ -273,7 +273,7 @@ void plasterCases() {
       def
       #enddocregion a
     ''';
-    final excerpter = new Excerpter(uri, content);
+    final excerpter = Excerpter(uri, content);
     expect(excerpter.weave().excerpts, {
       defaultRegionKey: stripDirectives(content),
       'a': ['abc', defaultPlaster, 'def'],
@@ -290,7 +290,7 @@ void plasterCases() {
       def
       #enddocregion a, b
     ''';
-    final excerpter = new Excerpter(uri, content);
+    final excerpter = Excerpter(uri, content);
     expect(excerpter.weave().excerpts, {
       defaultRegionKey: stripDirectives(content),
       'a': ['abc', 'def'],
@@ -309,7 +309,7 @@ void plasterCases() {
       def
       #enddocregion a, b
     ''';
-    final excerpter = new Excerpter(uri, content);
+    final excerpter = Excerpter(uri, content);
     expect(excerpter.weave().excerpts, {
       defaultRegionKey: stripDirectives(content),
       'a': ['abc', 'def'],
@@ -324,8 +324,8 @@ void plasterCases() {
 
 const eol = '\n';
 
-final _directiveRegEx = new RegExp(r'#(end)?docregion');
-final _blankLine = new RegExp(r'^\s*$');
+final _directiveRegEx = RegExp(r'#(end)?docregion');
+final _blankLine = RegExp(r'^\s*$');
 
 List<String> stripDirectives(String excerpt) {
   final lines = excerpt

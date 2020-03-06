@@ -5,19 +5,19 @@ import 'package:code_excerpter/src/directive.dart';
 void main() {
   group('basic', () {
     test('not a directive', () {
-      final d = new Directive.tryParse('');
+      final d = Directive.tryParse('');
       expect(d, isNull);
     });
 
     test(Kind.startRegion, () {
-      final d = new Directive.tryParse('#docregion');
+      final d = Directive.tryParse('#docregion');
       expect(d.kind, Kind.startRegion);
       expect(d.rawArgs, '');
       expect(d.args, []);
     });
 
     test(Kind.endRegion, () {
-      final d = new Directive.tryParse('#enddocregion');
+      final d = Directive.tryParse('#enddocregion');
       expect(d.kind, Kind.endRegion);
       expect(d.rawArgs, '');
       expect(d.args, []);
@@ -28,7 +28,7 @@ void main() {
   group('context insenstivie', () {
     test(Kind.startRegion, () {
       final spaces = '  ';
-      final d = new Directive.tryParse('$spaces// #docregion');
+      final d = Directive.tryParse('$spaces// #docregion');
       expect(d.kind, Kind.startRegion);
       expect(d.rawArgs, '');
       expect(d.args, []);
@@ -36,7 +36,7 @@ void main() {
     });
 
     test(Kind.endRegion, () {
-      final d = new Directive.tryParse(' #enddocregion a,b,  c  ');
+      final d = Directive.tryParse(' #enddocregion a,b,  c  ');
       expect(d.kind, Kind.endRegion);
       expect(d.rawArgs, 'a,b,  c');
       expect(d.args, ['a', 'b', 'c']);
@@ -47,7 +47,7 @@ void main() {
   group('close comment syntax:', () {
     group('HTML:', () {
       test(Kind.startRegion, () {
-        final d = new Directive.tryParse('<!--#docregion-->');
+        final d = Directive.tryParse('<!--#docregion-->');
         expect(d.kind, Kind.startRegion);
         expect(d.rawArgs, '');
         expect(d.args, []);
@@ -55,7 +55,7 @@ void main() {
       });
 
       test(Kind.endRegion, () {
-        final d = new Directive.tryParse('<!-- #enddocregion a -->  ');
+        final d = Directive.tryParse('<!-- #enddocregion a -->  ');
         expect(d.kind, Kind.endRegion);
         expect(d.rawArgs, 'a');
         expect(d.args, ['a']);
@@ -65,7 +65,7 @@ void main() {
 
     group('CSS:', () {
       test(Kind.startRegion, () {
-        final d = new Directive.tryParse('/*#docregion*/');
+        final d = Directive.tryParse('/*#docregion*/');
         expect(d.kind, Kind.startRegion);
         expect(d.rawArgs, '');
         expect(d.args, []);
@@ -73,7 +73,7 @@ void main() {
       });
 
       test(Kind.endRegion, () {
-        final d = new Directive.tryParse('/* #enddocregion a */  ');
+        final d = Directive.tryParse('/* #enddocregion a */  ');
         expect(d.kind, Kind.endRegion);
         expect(d.rawArgs, 'a');
         expect(d.args, ['a']);
@@ -84,7 +84,7 @@ void main() {
 
   group('problem cases:', () {
     test('Deprecated unquoted default region name', () {
-      final d = new Directive.tryParse("#docregion ,a");
+      final d = Directive.tryParse("#docregion ,a");
       expect(d.kind, Kind.startRegion);
       expect(d.rawArgs, ",a");
       expect(d.args, ['', 'a']);
@@ -92,7 +92,7 @@ void main() {
     });
 
     test('Duplicate "a" region', () {
-      final d = new Directive.tryParse('#docregion a,b,c,a');
+      final d = Directive.tryParse('#docregion a,b,c,a');
       expect(d.kind, Kind.startRegion);
       expect(d.rawArgs, 'a,b,c,a');
       expect(d.args, ['a', 'b', 'c']);
@@ -100,7 +100,7 @@ void main() {
     });
 
     test('Duplicate "" region', () {
-      final d = new Directive.tryParse("#docregion '',''");
+      final d = Directive.tryParse("#docregion '',''");
       expect(d.kind, Kind.startRegion);
       expect(d.rawArgs, "'',''");
       expect(d.args, ['']);

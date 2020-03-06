@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.2
+
+- Internal changes (ran dartfmt --fix).
+
 ## 0.6.1
 
 - Don't process dot files.
