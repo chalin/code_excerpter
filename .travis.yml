@@ -1,37 +1,24 @@
 language: dart
 
-dart: stable
+dart: [stable, dev]
 
 env:
   global:
     - LIBS="lib test"
+  jobs:
+    - TASK="dartanalyzer --fatal-warnings $LIBS analysis_options.yaml"
+    - TASK="pub run test"
+    - TASK="tool/builder_test.sh"
+    - TASK="dartfmt -n $LIBS"
 
-#dart_task:
-# - dartanalyzer: --fatal-warnings $LIBS
-# - dartfmt: -n $LIBS
-# - test
+dart_task: []
 
 jobs:
-  include:
-    - env: TASK=dartanalyzer
-      script:
-      - pub get
-      - $TASK --fatal-warnings $LIBS analysis_options.yaml
+  exclude:
+    - dart: dev
+      env:  TASK="dartfmt -n $LIBS"
 
-    - env: TASK=dartfmt
-      script:
-      - pub get
-      - $TASK -n $LIBS
-
-    - env: TASK="pub run test"
-      script:
-      - pub get
-      - $TASK
-
-    - env: TASK=tool/builder_test.sh
-      script:
-      - pub get
-      - $TASK
+script: [pub get, $TASK]
 
 cache:
   directories:
