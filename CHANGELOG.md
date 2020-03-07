@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0
+
+- When YAML excerpt files are generated, the excerpt values
+  are now multiline strings with a left border character as
+  the first character of each line. The value of the special
+  map key '#border' is the border character. (The code-excerpt
+  updater trims of this border character when present.)
+
 ## 0.6.2
 
 - Internal changes (ran dartfmt --fix).

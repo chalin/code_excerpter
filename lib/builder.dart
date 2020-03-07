@@ -5,6 +5,8 @@ import 'package:build/build.dart';
 import 'package:code_excerpter/src/util/line.dart';
 import 'package:code_excerpter/src/excerpter.dart';
 
+const excerptLineLeftBorderChar = '|';
+
 Builder builder(BuilderOptions options) => CodeExcerptBuilder(options);
 
 class CodeExcerptBuilder implements Builder {
@@ -38,8 +40,12 @@ class CodeExcerptBuilder implements Builder {
       };
 
   String _toYaml(Map<String, List<String>> excerpts) {
+    if (excerpts.isEmpty) return '';
+
+    const yamlExcerptLeftBorderCharKey = '#border';
     final StringBuffer s = StringBuffer();
 
+    s.writeln("'$yamlExcerptLeftBorderCharKey': '$excerptLineLeftBorderChar'");
     excerpts.forEach((name, lines) {
       s.writeln(_yamlEntry(name, lines));
     });
@@ -48,7 +54,8 @@ class CodeExcerptBuilder implements Builder {
 
   String _yamlEntry(String regionName, List<String> lines) {
     final codeAsYamlStringValue = lines
-        .map((line) => '  $line') // indent by 2 spaces for YAML
+        // YAML multiline string: indent by 2 spaces.
+        .map((line) => '  $excerptLineLeftBorderChar$line')
         .join(eol);
     return "'$regionName': |+\n$codeAsYamlStringValue";
   }
