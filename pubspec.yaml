@@ -12,6 +12,10 @@ dependencies:
 
 dev_dependencies:
   analysis_defaults:
-    path: ../analysis_defaults
+    git:
+      url: https://github.com/chalin/site-shared
+      ref: 9127a89a3394f6617cae4aebf1f30d804f21ac74 # 9127a89 [origin/main] Bump actions/cache from 3.3.2 to 4.0.0 (#206)
+      path: packages/analysis_defaults
   build_runner: ^2.4.6
+  mono_repo: ^6.6.1
   test: ^1.24.8

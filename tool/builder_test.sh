@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-pub run build_runner build --config example --output=build
+dart run build_runner build --config example --output=build
 
 if diff -r build build_expected | grep -Ev "^Only in "; then
   echo
