@@ -10,7 +10,7 @@ fragments are extracted from the docs**, then analyzed and tested.
 (2) A complementary approach where named **code regions are extracted from
 sources**, and docs are refreshed (as needed) when code regions change.
 
-Both approaches have their merits, but `code_excerpter`, and its companion tool 
+Both approaches have their merits, but `code_excerpter`, and its companion tool
 [code_excerpt_updater][], support (2). More specifically:
 
 - `code_excerpter` is a builder that can be used to extract code regions from source files.
@@ -29,7 +29,6 @@ Both approaches have their merits, but `code_excerpter`, and its companion tool
 Repeat steps 2-4 as the code base evolves.
 
 ## Examples sources
-
 
 ```dart
 // #docregion imports
@@ -77,7 +76,7 @@ By default, when the [code_excerpt_updater][] renders a region with breaks,
 each breaks is replaced by a (language-specific) comment line filled with a
 plaster marker (`···`).
 
-For details concerning the processing of plasters, see the 
+For details concerning the processing of plasters, see the
 [code_excerpt_updater][] documentation.
 
 Notes:
@@ -86,7 +85,6 @@ Notes:
   `#enddocregion` can be omitted.
 - The `code_excerpter` supports source files in all popular languages including
   Dart, HTML, YAML, CSS, SCSS, and more.
-  
 
 ## Syntax
 
@@ -95,12 +93,12 @@ As illustrated above, the region markers can be followed by zero or more comma-s
 A legal **region name** is one of:
 
 - `''`
-- A non-empty sequence of alpha-numeric characters possibly containing a hypen (`-`)
+- A non-empty sequence of alphanumeric characters possibly containing a hyphen (`-`)
   or an underscore (`_`).
 
 ## Sample builder config
 
-To use the builder, create a config file such as the following:
+To use the builder, create a config file such as the following `build.yaml` file:
 
 ```yaml
 targets:
@@ -117,8 +115,8 @@ targets:
 
 Build by running this command:
 
-```console
-> pub run build_runner build --output=<some-directory>
+```sh
+dart run build_runner build --output=<some-directory>
 ```
 
 Yaml files containing excerpts (`*.excerpt.yaml`) will be placed in the build output folder.

@@ -2,26 +2,33 @@ import 'dart:async';
 
 import 'package:build/build.dart';
 
-import 'package:code_excerpter/src/util/line.dart';
-import 'package:code_excerpter/src/excerpter.dart';
+import 'src/excerpter.dart';
+import 'src/util/line.dart';
 
 const excerptLineLeftBorderChar = '|';
 
 Builder builder(BuilderOptions options) => CodeExcerptBuilder(options);
 
 class CodeExcerptBuilder implements Builder {
-  final outputExtension = '.excerpt.yaml';
+  static const outputExtension = '.excerpt.yaml';
 
-  BuilderOptions options;
+  final BuilderOptions? options;
 
-  CodeExcerptBuilder(this.options);
+  CodeExcerptBuilder([this.options]);
 
   @override
   Future<void> build(BuildStep buildStep) async {
-    AssetId assetId = buildStep.inputId;
+    final assetId = buildStep.inputId;
     if (assetId.package.startsWith(r'$') || assetId.path.endsWith(r'$')) return;
 
-    final content = await buildStep.readAsString(assetId);
+    final String content;
+    try {
+      content = await buildStep.readAsString(assetId);
+    } on FormatException {
+      log.finest('Skipped ${assetId.path} due to failing to read as string.');
+      return;
+    }
+
     final outputAssetId = assetId.addExtension(outputExtension);
 
     final excerpter = Excerpter(assetId.path, content);
@@ -43,7 +50,7 @@ class CodeExcerptBuilder implements Builder {
     if (excerpts.isEmpty) return '';
 
     const yamlExcerptLeftBorderCharKey = '#border';
-    final StringBuffer s = StringBuffer();
+    final s = StringBuffer();
 
     s.writeln("'$yamlExcerptLeftBorderCharKey': '$excerptLineLeftBorderChar'");
     excerpts.forEach((name, lines) {

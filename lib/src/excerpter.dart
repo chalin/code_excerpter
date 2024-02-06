@@ -1,15 +1,13 @@
-import 'package:code_excerpter/src/util/line.dart';
-
 import 'directive.dart';
+import 'util/line.dart';
 import 'util/logging.dart';
-import 'nullable.dart';
 
 /// Key used for excerpt representing the entire file w/o directives
 const fullFileKey = '\u0000';
 const defaultRegionKey = '';
 const defaultPlaster = '···';
 
-Map<String, List<String>> newExcerptsMap() => Map();
+Map<String, List<String>> newExcerptsMap() => {};
 
 class Excerpter {
   final String uri;
@@ -30,7 +28,7 @@ class Excerpter {
         _lineIdx = 0;
 
   final Map<String, List<String>> excerpts = newExcerptsMap();
-  final Set<String> _openExcerpts = Set();
+  final Set<String> _openExcerpts = {};
 
   Excerpter weave() {
     final lines = content.split(eol);
@@ -38,15 +36,20 @@ class Excerpter {
     // Collect the full file in case we need it.
     _excerptStart(fullFileKey);
 
-    for (_lineIdx = 0; _lineIdx < lines.length; _lineIdx++) _processLine();
+    for (_lineIdx = 0; _lineIdx < lines.length; _lineIdx++) {
+      _processLine();
+    }
 
     // Drop trailing blank lines for all excerpts.
     // Normalize indentation for all but the full file.
-    for (final name in excerpts.keys) {
-      dropTrailingBlankLines(excerpts[name]);
-      _dropTrailingPlaster(excerpts[name]);
+    for (final entry in excerpts.entries) {
+      final name = entry.key;
+      final excerpt = entry.value;
+
+      dropTrailingBlankLines(excerpt);
+      _dropTrailingPlaster(excerpt);
       if (name == fullFileKey) continue;
-      excerpts[name] = maxUnindent(excerpts[name]).toList();
+      excerpts[name] = maxUnindent(excerpt).toList();
     }
 
     // Final adjustment to excerpts relative to fullFileKey:
@@ -58,8 +61,10 @@ class Excerpter {
       excerpts.remove(fullFileKey);
     } else {
       // Report fullFileKey excerpt for defaultRegionKey
-      excerpts[defaultRegionKey] = excerpts[fullFileKey];
-      excerpts.remove(fullFileKey);
+      final fullFileExcerpt = excerpts.remove(fullFileKey);
+      if (fullFileExcerpt != null) {
+        excerpts[defaultRegionKey] = fullFileExcerpt;
+      }
     }
     return this;
   }
@@ -69,37 +74,38 @@ class Excerpter {
 
     if (directive == null) {
       // Add line to open regions
-      _openExcerpts.forEach((name) => excerpts[name].add(_line));
+      for (final name in _openExcerpts) {
+        excerpts[name]?.add(_line);
+      }
       return;
     }
 
-    directive.issues.forEach((issue) => _warn(issue));
+    directive.issues.forEach(_warn);
 
     switch (directive.kind) {
       case Kind.startRegion:
         containsDirectives = true;
         _startRegion(directive);
-        break;
       case Kind.endRegion:
         containsDirectives = true;
         _endRegion(directive);
-        break;
       default:
         throw Exception('Unimplemented directive: $_line');
     }
   }
 
   void _startRegion(Directive directive) {
-    @nullable
-    List<String> regionAlreadyStarted;
+    final regionAlreadyStarted = <String>[];
+    final regionNames = directive.args;
 
-    var regionNames = directive.args;
     log.finer('_startRegion(regionNames = $regionNames)');
 
     if (regionNames.isEmpty) regionNames.add(defaultRegionKey);
     for (final name in regionNames) {
       final isNew = _excerptStart(name);
-      if (!isNew) (regionAlreadyStarted ??= []).add(_quoteName(name));
+      if (!isNew) {
+        regionAlreadyStarted.add(_quoteName(name));
+      }
     }
 
     _warnRegions(
@@ -109,9 +115,8 @@ class Excerpter {
   }
 
   void _endRegion(Directive directive) {
-    @nullable
-    List<String> regionsWithoutStart;
-    var regionNames = directive.args;
+    final regionsWithoutStart = <String>[];
+    final regionNames = directive.args;
     log.finer('_endRegion(regionNames = $regionNames)');
 
     if (regionNames.isEmpty) {
@@ -121,15 +126,20 @@ class Excerpter {
 
     for (final name in regionNames) {
       if (_openExcerpts.remove(name)) {
-        if (excerpts[name].isEmpty) {
+        final excerpt = excerpts[name];
+        if (excerpt == null) {
+          return;
+        }
+
+        if (excerpt.isEmpty) {
           _warnRegions(
             [name],
             (regions) => 'empty $regions',
           );
         }
-        excerpts[name].add(directive.indentation + defaultPlaster);
+        excerpt.add(directive.indentation + defaultPlaster);
       } else {
-        (regionsWithoutStart ??= []).add(_quoteName(name));
+        regionsWithoutStart.add(_quoteName(name));
       }
     }
 
@@ -140,14 +150,16 @@ class Excerpter {
   }
 
   void _warnRegions(
-    List<String> _regions,
+    List<String> regions,
     String Function(String) msg,
   ) {
-    if (_regions == null) return;
-    final regions = _regions.join(', ');
-    final s = regions.isEmpty
+    if (regions.isEmpty) return;
+    final joinedRegions = regions.join(', ');
+    final s = joinedRegions.isEmpty
         ? ''
-        : _regions.length > 1 ? 's ($regions)' : ' $regions';
+        : regions.length > 1
+            ? 's ($joinedRegions)'
+            : ' $joinedRegions';
     _warn(msg('region$s'));
   }
 
