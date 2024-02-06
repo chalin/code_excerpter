@@ -4,7 +4,7 @@ import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
 // Mock URI used for all content origins.
-final uri = 'foo';
+const uri = 'foo';
 
 List<String> contentGeneratingNoExcerpts = [
   '',
@@ -13,26 +13,26 @@ List<String> contentGeneratingNoExcerpts = [
   'docregion', // Without leading #
 ];
 
-final emptyLines = List.unmodifiable([]);
+final emptyLines = List<String>.unmodifiable(<String>[]);
 
 final List<LogRecord> logs = [];
 
-void _expectNoLogs() => expect(logs, []);
+void _expectNoLogs() => expect(logs, <LogRecord>[]);
 
 void main() {
   setUpAll(() {
     logListeners.clear(); // Don't print during tests
-    logListeners.add((r) => logs.add(r));
+    logListeners.add(logs.add);
   });
 
-  setUp(() => logs.clear());
+  setUp(logs.clear);
 
   // Each individual test must check [logs], and then clear them.
   // This will catch situations where this is not done.
   tearDown(_expectNoLogs);
 
   test('helper sanity:', () {
-    var content = '''
+    const content = '''
       #docregion a
         abc
       #enddocregion a
@@ -52,7 +52,7 @@ void main() {
       test(testName, () {
         final excerpter = Excerpter(uri, content);
         excerpter.weave();
-        expect(excerpter.excerpts, {});
+        expect(excerpter.excerpts, <String, List<String>>{});
         _expectNoLogs();
       });
     }
@@ -84,7 +84,7 @@ void main() {
     });
 
     test('region a', () {
-      var content = '''
+      const content = '''
         #docregion a
           abc
         #enddocregion a
@@ -99,7 +99,7 @@ void main() {
   });
 
   test('two disjoint regions', () {
-    var content = '''
+    const content = '''
       #docregion a
         abc
       #enddocregion a
@@ -117,7 +117,7 @@ void main() {
   });
 
   group('region not closed:', () {
-    ['', '\n'].forEach((eol) {
+    for (final eol in const ['', '\n']) {
       group('empty region:', () {
         test('default region', () {
           final excerpter = Excerpter(uri, '#docregion$eol');
@@ -140,7 +140,7 @@ void main() {
             {defaultRegionKey: expectedLines, 'b': expectedLines});
         _expectNoLogs();
       });
-    });
+    }
   });
 
   group('problems:', problemCases);
@@ -153,7 +153,7 @@ void problemCases() {
     excerpter.weave();
     expect(logs.length, 1);
     expect(logs[0].message, contains('empty region at $uri:2'));
-    expect(excerpter.excerpts, {defaultRegionKey: []});
+    expect(excerpter.excerpts, {defaultRegionKey: <String>[]});
     logs.clear();
   });
 
@@ -215,7 +215,7 @@ void problemCases() {
       expect(
           logs[0].message, contains('repeated start for region "" at $uri:2'));
       expect(excerpter.excerpts, {
-        defaultRegionKey: [],
+        defaultRegionKey: <String>[],
       });
       logs.clear();
     });
@@ -227,8 +227,8 @@ void problemCases() {
       expect(
           logs[0].message, contains('repeated start for region "a" at $uri:2'));
       expect(excerpter.excerpts, {
-        defaultRegionKey: [],
-        'a': [],
+        defaultRegionKey: <String>[],
+        'a': <String>[],
       });
       logs.clear();
     });
@@ -242,8 +242,8 @@ void problemCases() {
       expect(logs[0].message,
           contains('unquoted default region name is deprecated at $uri:1'));
       expect(excerpter.excerpts, {
-        defaultRegionKey: [],
-        'a': [],
+        defaultRegionKey: <String>[],
+        'a': <String>[],
       });
       logs.clear();
     });
@@ -254,8 +254,8 @@ void problemCases() {
       expect(logs.length, 1);
       expect(logs[0].message, contains('repeated argument "a" at $uri:1'));
       expect(excerpter.excerpts, {
-        defaultRegionKey: [],
-        'a': [],
+        defaultRegionKey: <String>[],
+        'a': <String>[],
       });
       logs.clear();
     });
@@ -264,7 +264,7 @@ void problemCases() {
 
 void plasterCases() {
   test('region a with 1 plaster', () {
-    var content = '''
+    const content = '''
       #docregion a
       abc
       #enddocregion a
@@ -282,7 +282,7 @@ void plasterCases() {
   });
 
   test('overlapping regions', () {
-    var content = '''
+    const content = '''
       #docregion a,b,c
       abc
       #enddocregion b, c
@@ -301,7 +301,7 @@ void plasterCases() {
   });
 
   test('plaster with different indentations', () {
-    var content = '''
+    const content = '''
       #docregion a,b,c
       abc
         #enddocregion b, c

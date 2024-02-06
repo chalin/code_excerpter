@@ -1,19 +1,21 @@
 name: code_excerpter
-version: 1.0.0
-description: A line-based utility for extracting code regions.
-
-author: Patrice Chalin <pchalin@gmail.com>
-homepage: https://github.com/chalin/code_excerpter
+publish_to: none
 
 environment:
-  sdk: '>=2.0.0 <3.0.0'
+  sdk: ^3.1.0
 
 dependencies:
-  build: ^1.2.2
-  logging: ^0.11.3+1
-  path: ^1.6.0
-  yaml: ^2.1.0
+  build: ^2.4.1
+  logging: ^1.2.0
+  path: ^1.8.3
+  yaml: ^3.1.2
 
 dev_dependencies:
-  build_runner: ^1.8.0
-  test: ^1.0.0
+  analysis_defaults:
+    git:
+      url: https://github.com/chalin/site-shared
+      ref: 9127a89a3394f6617cae4aebf1f30d804f21ac74 # 9127a89 [origin/main] Bump actions/cache from 3.3.2 to 4.0.0 (#206)
+      path: packages/analysis_defaults
+  build_runner: ^2.4.6
+  mono_repo: ^6.6.1
+  test: ^1.24.8
